@@ -166,6 +166,20 @@ export class Reservation {
   @Prop({ type: String, default: null })
   referencePaiement: string | null;
 
+  /**
+   * L'intention de paiement créée chez le prestataire.
+   *
+   * Conservée pour deux raisons : rendre l'opération idempotente côté
+   * domaine — une seconde demande retrouve l'intention au lieu d'en créer une
+   * autre — et permettre de rapprocher une notification d'une réservation si
+   * jamais les métadonnées venaient à manquer.
+   *
+   * SANS `@Field` : l'identifiant ne sert qu'au serveur. Le navigateur reçoit
+   * le secret client, qui n'autorise que le paiement de cette intention-là.
+   */
+  @Prop({ type: String, default: null })
+  intentionPaiement: string | null;
+
   @Field()
   createdAt: Date;
 }

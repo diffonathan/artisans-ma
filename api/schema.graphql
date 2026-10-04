@@ -8,6 +8,9 @@ type Artisan {
 
   """Distance au besoin recherché, en mètres."""
   distanceMetres: Float
+
+  """L'artisan peut recevoir des paiements par la plateforme."""
+  encaissementsActifs: Boolean!
   metiers: [Metier!]!
   nombreAvis: Int!
   noteMoyenne: Float!
@@ -183,9 +186,19 @@ type Mutation {
   inscrireClient(entree: EntreeInscriptionClient!): Session!
 
   """
+  Ouvre les encaissements de l'artisan et rend l'adresse où fournir ses pièces. Rejouable : un lien expiré se remplace sans recréer le compte.
+  """
+  ouvrirEncaissements: String!
+
+  """
   Marque la réservation comme payée. Rejouable sans effet : la seconde fois ne change rien. En production, cette bascule viendrait de la notification signée du prestataire, pas du client.
   """
   payerReservation(id: ID!, referencePaiement: String!): Reservation!
+
+  """
+  Prépare le paiement de la réservation et rend le secret client. Le montant n'est jamais transmis : il est lu sur la réservation.
+  """
+  preparerPaiement(reservation: ID!): String!
 
   """Propose un devis sur un besoin ouvert."""
   proposerDevis(entree: EntreeDevisGql!): Devis!
@@ -227,6 +240,9 @@ type Query {
 
   """Mes devis envoyés, du plus récent au plus ancien."""
   mesDevis: [Devis!]!
+
+  """Relit l'état des encaissements chez le prestataire."""
+  mesEncaissementsSontActifs: Boolean!
   mesReservations: [Reservation!]!
 
   """Le compte authentifié."""
@@ -235,7 +251,9 @@ type Query {
   """Mon planning, par créneau croissant."""
   monPlanning: [Reservation!]!
 
-  """Le profil artisan du compte authentifié, s'il en a un."""
+  """
+  Le profil artisan du compte authentifié, s'il en a un. C'est le seul chemin par lequel un artisan lit son propre profil.
+  """
   monProfilArtisan: Artisan
 
   """

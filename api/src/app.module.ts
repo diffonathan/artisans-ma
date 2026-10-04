@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import type { Request } from 'express';
 
 import { NoyauModule } from './noyau.module.js';
+import { PaiementModule } from './paiement/paiement.module.js';
 import { DomaineModule } from './domaine/domaine.module.js';
 import { FabriqueChargeurs } from './commun/chargeurs.js';
 import { GardeAuthentification } from './commun/authentification.js';
@@ -21,6 +22,7 @@ import { GardeAuthentification } from './commun/authentification.js';
 @Module({
   imports: [
     NoyauModule,
+    PaiementModule,
 
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,

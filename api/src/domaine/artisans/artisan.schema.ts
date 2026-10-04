@@ -63,6 +63,32 @@ export class Artisan {
   actif: boolean;
 
   /**
+   * Le compte d'encaissement chez le prestataire de paiement.
+   *
+   * SANS `@Field` : c'est un identifiant de compte financier, il n'a rien à
+   * faire dans une fiche publique. L'artisan lui-même le voit à travers
+   * `monProfilArtisan`, par un résolveur qui sait à qui il parle.
+   */
+  @Prop({ type: String, default: null })
+  compteEncaissement: string | null;
+
+  /**
+   * Le prestataire accepte-t-il d'encaisser POUR cet artisan ?
+   *
+   * Ce n'est pas « le compte existe ». Un artisan peut ouvrir son compte et
+   * abandonner avant d'avoir fourni ses pièces : le compte existe, et aucun
+   * encaissement n'est possible. Accepter un devis dans cet état créerait une
+   * réservation qu'on ne saurait ni encaisser ni reverser — un piège pour les
+   * deux parties.
+   *
+   * Exposé, lui, parce qu'un client a le droit de savoir si l'artisan qu'il
+   * regarde peut être payé par la plateforme.
+   */
+  @Prop({ default: false })
+  @Field({ description: "L'artisan peut recevoir des paiements par la plateforme." })
+  encaissementsActifs: boolean;
+
+  /**
    * Note moyenne et nombre d'avis, recopiés ici depuis la collection `avis`.
    *
    * ── Pourquoi dupliquer une donnée qu'on sait recalculer ─────────────────

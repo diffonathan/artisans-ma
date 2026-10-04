@@ -121,7 +121,9 @@ export class ComptesResolver {
 
   @Query(() => Artisan, {
     nullable: true,
-    description: "Le profil artisan du compte authentifié, s'il en a un.",
+    description:
+      "Le profil artisan du compte authentifié, s'il en a un. " +
+      "C'est le seul chemin par lequel un artisan lit son propre profil.",
   })
   monProfilArtisan(@CompteConnecte() connecte: { id: Types.ObjectId }) {
     return this.comptes.artisanDuCompte(connecte.id);

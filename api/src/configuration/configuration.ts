@@ -35,6 +35,32 @@ const schema = z.object({
   COMMISSION_POINTS_DE_BASE: z.coerce.number().int().min(0).max(10_000).default(800),
 
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+
+  /**
+   * Les clés du prestataire de paiement — toutes FACULTATIVES, et c'est une
+   * décision.
+   *
+   * Sans elles, l'application démarre avec un prestataire factice : le
+   * parcours complet reste jouable, les tests tournent, et quiconque clone le
+   * dépôt peut voir fonctionner la place de marché. Les exiger rendrait le
+   * projet injouable sans un compte Stripe, pour une démonstration.
+   *
+   * Le prix est qu'une absence de clé en PRODUCTION passerait inaperçue. D'où
+   * l'avertissement au démarrage dans `paiement.module.ts`, et le fait que
+   * l'interface dise, à l'écran, que les paiements ne sont pas réels.
+   */
+  STRIPE_CLE_SECRETE: z.string().optional(),
+
+  /**
+   * Le secret de signature des notifications. Sans lui, les notifications
+   * sont REFUSÉES plutôt qu'acceptées sans contrôle : le point d'entrée est
+   * public, et une notification non vérifiée permet à n'importe qui de
+   * déclarer une réservation payée.
+   */
+  STRIPE_SECRET_NOTIFICATION: z.string().optional(),
+
+  /** Où l'artisan revient après avoir fourni ses pièces chez le prestataire. */
+  URL_PUBLIQUE: z.string().default('http://localhost:3100'),
 });
 
 export type Configuration = z.infer<typeof schema>;

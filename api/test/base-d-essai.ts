@@ -71,7 +71,24 @@ export const creerApplicationDEssai = async (
     imports: [options.http ? AppModule : NoyauModule],
   }).compile();
 
-  const app: INestApplication = moduleRef.createNestApplication();
+  const app: INestApplication = moduleRef.createNestApplication({
+    /**
+     * `rawBody` DOIT être posé ici aussi, et pas seulement dans `main.ts`.
+     *
+     * Les notifications de paiement sont signées sur les octets exacts du
+     * corps. Sans cette option, Express analyse le JSON et les octets
+     * d'origine sont perdus : le contrôleur refuse alors toute notification,
+     * en production comme en test.
+     *
+     * Le défaut a été trouvé par les tests du paiement — huit refus en 400
+     * « corps brut absent » — et il illustre un piège plus général : une
+     * option posée dans `main.ts` n'existe pas dans le montage de test, qui
+     * crée l'application autrement. Toute configuration qui change le
+     * comportement doit être posée aux DEUX endroits, sinon les tests
+     * éprouvent une application qui n'est pas celle qu'on déploie.
+     */
+    rawBody: true,
+  });
 
   // `init()` déclenche `onApplicationBootstrap`, donc `syncIndexes()`.
   //

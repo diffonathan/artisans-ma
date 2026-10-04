@@ -412,7 +412,7 @@ npm run start:dev
 L'API et son bac à sable sont sur <http://localhost:3000/graphql>.
 
 ```bash
-npm run verifier            # types + 74 tests
+npm run verifier            # types + 92 tests
 npm run verifier-integrite  # contrôle référentiel
 ```
 
@@ -472,6 +472,9 @@ montrer l'effet du rayon propre à chacun.
 | l'avis référence une réservation réelle | **rien** — contrôle périodique | `verifier-integrite.ts` |
 | l'adresse n'est lue que par le client et l'artisan retenu | l'adresse est **recopiée** sur la réservation, et les réservations ne sont atteignables que par leurs deux parties | `reservation.schema.ts` |
 | les coordonnées du client ne fuient pas avant la réservation | `Besoin.demandeur` réservé au propriétaire ; les autres lisent `nomDemandeur` | `besoins.resolver.ts` |
+| le montant encaissé est celui du devis accepté | **aucun champ de montant** dans le schéma ni dans l'interface de paiement — il n'a pas de chemin pour revenir du navigateur | `paiement.port.ts` |
+| une notification de paiement ne peut pas être forgée | signature vérifiée sur le corps brut ; sans secret, refus | `paiement.controleur.ts` |
+| on n'encaisse pas ce qu'on ne saura pas reverser | `charges_enabled` **et** `payouts_enabled` exigés avant tout paiement | `paiement.service.ts` |
 
 La dernière ligne est la seule que MongoDB ne sait pas tenir. Elle est écrite
 comme telle.
@@ -486,6 +489,7 @@ comme telle.
 | Base | MongoDB 8 en replica set, Mongoose 9 |
 | Tests | vitest, supertest, contre un vrai MongoDB |
 | Authentification | JWT, scrypt (bibliothèque standard de Node) |
+| Paiement | Stripe Connect, destination charge, notifications signées |
 | Infrastructure | Docker Compose |
 
 ---
@@ -496,12 +500,20 @@ comme telle.
 réservations, avis), l'API GraphQL avec rôles et chargeurs groupés, la
 recherche géographique, le contrôle d'intégrité, le jeu de données, 74 tests.
 
-**Reste** — l'interface web (Next.js), et le paiement par Stripe Connect en
-mode test : le passage à `PAYEE` est aujourd'hui déclenché par une mutation,
-alors qu'en production il viendrait de la notification signée du prestataire.
-C'est écrit dans la description de cette mutation plutôt que caché : une démo
-qui laisse croire que le client déclare lui-même ses paiements est une démo
-trompeuse.
+**Reste** — la mise en ligne. Elle demande une grappe MongoDB Atlas M0 et un
+service Render : tout est préparé et éprouvé, le pas à pas est dans
+[`deploy/DEPLOIEMENT.md`](deploy/DEPLOIEMENT.md).
+
+**Le paiement est fait**, par Stripe Connect en destination charge. Le passage
+à `PAYEE` vient désormais de la **notification signée** du prestataire, pas du
+client. La mutation de démonstration reste, et dit ce qu'elle est.
+
+Sans clé Stripe, l'application démarre avec un prestataire factice et le
+parcours reste jouable. Ce faux n'est pas complaisant : il calcule de vraies
+signatures HMAC, crée des comptes **inactifs** comme Stripe le fait avant que
+les pièces soient fournies, et c'est ce qui permet d'éprouver le refus
+d'encaisser pour un artisan qu'on ne saurait pas payer. Détail et limites dans
+[`docs/PAIEMENT.md`](docs/PAIEMENT.md).
 
 **Une transparence sur les tests** — sur une dizaine d'exécutions complètes de
 la suite, une a échoué au démarrage d'un fichier sans que la cause soit
