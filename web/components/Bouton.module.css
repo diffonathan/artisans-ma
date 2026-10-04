@@ -1,0 +1,168 @@
+/* Toutes les teintes sont des jetons. Aucune n'est recalculée : les choix de
+   CONTRASTE ci-dessous expliquent pourquoi c'est --primary-dim et non
+   --primary qui porte le bouton principal. */
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espace-2);
+  border: 1px solid transparent;
+  border-radius: var(--rayon-sm);
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--duree-courte) var(--courbe),
+    border-color var(--duree-courte) var(--courbe),
+    color var(--duree-courte) var(--courbe),
+    transform var(--duree-courte) var(--courbe),
+    box-shadow var(--duree-courte) var(--courbe);
+}
+
+/* Le clic s'enfonce. 1 px seulement : au-delà, le texte d'un bouton large
+   semble glisser sous le curseur. */
+.bouton:active:not(:disabled):not([aria-disabled='true']) {
+  transform: translateY(1px);
+}
+
+/* Les deux formes d'indisponibilité, et elles ne sont pas redondantes :
+   `disabled` est celle que l'appelant demande, `aria-disabled` est celle de
+   l'attente (`enCours`), qui garde le bouton focalisable pour que son
+   `aria-busy` soit annoncé à qui vient d'appuyer. D'où le `:not()` double sur
+   chaque survol plus bas : sans lui, un bouton en attente se soulèverait
+   encore sous le curseur. */
+.bouton:disabled,
+.bouton[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.pleineLargeur {
+  width: 100%;
+}
+
+/* ── Tailles ──────────────────────────────────────────────────────────────
+   Les hauteurs minimales ne sont pas décoratives : 44 px est la cible tactile
+   confortable, et la plupart des clients de ce service remplissent le
+   formulaire d'un besoin sur un téléphone. `sm` passe dessous volontairement,
+   et n'est donc réservé qu'aux actions secondaires d'une ligne dense. */
+
+.sm {
+  padding: 0.35rem 0.7rem;
+  font-size: var(--txt-sm);
+  min-height: 2rem;
+}
+
+.md {
+  padding: 0.6rem 1.15rem;
+  font-size: var(--txt-base);
+  min-height: 2.75rem;
+}
+
+.lg {
+  padding: 0.8rem 1.6rem;
+  font-size: var(--txt-md);
+  min-height: 3.25rem;
+}
+
+/* ── Primaire ─────────────────────────────────────────────────────────────
+   --primary-dim et non --primary, et c'est MESURÉ, pas une préférence :
+   --texte sur --primary donne 3,4:1, sous le seuil AA de 4,5:1 pour du texte
+   courant ; sur --primary-dim il donne 4,9:1. Le jeton clair reste donc pour
+   les traits et les textes d'accent sur fond nuit, où c'est lui qui a le bon
+   contraste.
+
+   Et pas de --grad-accent ici, pour la même raison : l'extrémité CLAIRE de ce
+   dégradé ramènerait le même texte à 2,0:1. Un dégradé sous du texte fait
+   varier le contraste le long du bouton, donc il n'y existe aucune couleur de
+   texte juste. Le dégradé reste bon pour les surfaces sans texte. */
+
+.primaire {
+  background-color: var(--primary-dim);
+  color: var(--texte);
+}
+
+/* Le survol ne change PAS le fond : l'éclaircir vers --primary ramènerait le
+   texte sous le seuil pendant qu'on le lit. Le halo et le soulèvement disent
+   la même chose sans toucher au contraste. */
+.primaire:hover:not(:disabled):not([aria-disabled='true']) {
+  box-shadow: var(--ombre-accent);
+  transform: translateY(-1px);
+}
+
+/* ── Secondaire ─────────────────────────────────────────────────────────── */
+
+.secondaire {
+  background-color: var(--verre-fond-haut);
+  border-color: var(--verre-bordure);
+  color: var(--texte);
+  backdrop-filter: var(--verre-flou);
+  -webkit-backdrop-filter: var(--verre-flou);
+}
+
+.secondaire:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--accent-soft);
+  border-color: var(--glass-border-hover);
+}
+
+/* ── Fantôme ──────────────────────────────────────────────────────────────
+   Pour l'action qu'on propose sans la recommander : « Annuler » à côté d'un
+   « Confirmer ». Sans fond ni bordure au repos, elle ne concurrence pas
+   l'action principale du même groupe. */
+
+.fantome {
+  background-color: transparent;
+  color: var(--texte-doux);
+}
+
+.fantome:hover:not(:disabled):not([aria-disabled='true']) {
+  background-color: var(--verre-fond);
+  color: var(--texte);
+}
+
+/* ── Danger ───────────────────────────────────────────────────────────────
+   Cerné, pas plein. Un bloc rouge saturé pour « Annuler la réservation » est
+   plus visible que l'action principale de la page, et finit par être cliqué
+   par réflexe. Le cerne dit la gravité sans prendre le dessus. */
+
+.danger {
+  background-color: var(--rouge-soft);
+  border-color: var(--rouge-border);
+  color: var(--rouge);
+}
+
+.danger:hover:not(:disabled):not([aria-disabled='true']) {
+  border-color: var(--rouge);
+}
+
+/* ── L'indicateur d'attente ───────────────────────────────────────────────
+   Un anneau dont un quart est opaque : la rotation se lit, et il n'y a qu'une
+   forme à dessiner. `currentColor` le fait suivre la variante sans quatre
+   règles de plus.
+
+   Sous prefers-reduced-motion, la règle globale de globals.css ramène toutes
+   les durées à 1 ms : l'anneau cesse de tourner et devient un point fixe.
+   C'est assumé — l'information « en cours » est portée par `aria-busy` et par
+   `aria-disabled`, pas par le mouvement. */
+
+.rouet {
+  width: 0.95em;
+  height: 0.95em;
+  flex: none;
+  border: 2px solid currentColor;
+  /* La portion transparente : c'est elle qui rend la rotation visible. */
+  border-top-color: transparent;
+  border-radius: var(--rayon-pleine);
+  animation: rotation 700ms linear infinite;
+}
+
+@keyframes rotation {
+  to {
+    transform: rotate(360deg);
+  }
+}

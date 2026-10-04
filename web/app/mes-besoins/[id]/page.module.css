@@ -1,0 +1,455 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   UN CHANTIER ET SES DEVIS — l'écran de décision
+
+   Aucune couleur en dur : tout est var(--…), défini dans app/globals.css
+   d'après CHARTE.md. Le texte d'accent prend --accent-texte et jamais
+   --primary, qui tombe à 3,2:1 sur le verre.
+
+   ── La règle de cet écran : AUCUNE hiérarchie entre les devis ─────────────
+   Pas de carte mise en avant, pas de bordure d'accent sur le moins cher, pas
+   d'ordre visuel qui suggère un classement. La seule carte qui se distingue
+   est celle que le LECTEUR a cochée. C'est une contrainte de conception
+   autant que de style : le jour où quelqu'un ajoute ici un
+   `.devisMeilleurPrix`, l'écran recommande, et il n'a rien pour le justifier.
+
+   ── Spécificité : pourquoi `div.devisCarte` ───────────────────────────────
+   Les cartes reçoivent `.carte` de Carte.module.css, qui pose
+   `display: block`. Deux sélecteurs d'une seule classe se départagent par
+   l'ORDRE des feuilles, lequel dépend de l'ordre des imports — un
+   réarrangement casserait la mise en page sans erreur. Un sélecteur
+   `élément + classe` l'emporte par spécificité.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+  /* Pas de `padding-block` : le <main> de l'enveloppe en pose déjà un, et
+     l'ajouter ici donnait à ces pages une respiration de haut différente des
+     autres sans qu'on voie d'où elle venait. */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE CHANTIER
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.enTete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.enTeteHaut {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-4);
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.titre {
+  max-width: 54ch;
+}
+
+/* ── Le résumé en trois cases ────────────────────────────────────────────── */
+
+.resume {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--espace-4);
+  padding: var(--espace-4);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-md);
+  background-color: var(--verre-fond);
+  margin: 0;
+}
+
+.resumeCase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  min-width: 0;
+}
+
+.resumeNom {
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+}
+
+.resumeValeur {
+  margin: 0;
+  /* Une adresse saisie à la main peut être un seul mot très long. */
+  overflow-wrap: anywhere;
+}
+
+.resumeAbsent {
+  color: var(--texte-doux);
+}
+
+/* ── La description ──────────────────────────────────────────────────────── */
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+  max-width: 72ch;
+}
+
+.descriptionTitre {
+  font-size: var(--txt-base);
+  font-weight: 600;
+}
+
+/* `pre-line` et non `pre` : les retours à la ligne du `textarea` sont
+   conservés, mais les lignes continuent de se replier sur la largeur
+   disponible. `pre` ferait défiler la page horizontalement sur téléphone. */
+.descriptionTexte {
+  white-space: pre-line;
+  color: var(--texte-doux);
+}
+
+.confidentialite {
+  max-width: 72ch;
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES DEVIS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.sectionTitre {
+  font-size: var(--txt-lg);
+}
+
+.sectionPhrase {
+  max-width: 72ch;
+  color: var(--texte-doux);
+}
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.devis {
+  display: grid;
+  /* Deux colonnes dès 48 rem : c'est la largeur à partir de laquelle deux
+     devis côte à côte se comparent d'un coup d'œil, ce qui est tout l'objet
+     de cet écran. En dessous, une colonne. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--espace-4);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.devisEtiquette {
+  display: block;
+  height: 100%;
+}
+
+.devisChoisissable {
+  cursor: pointer;
+}
+
+/* Un devis refusé, retiré ou déjà accepté n'est plus un choix : il recule d'un
+   plan en PERDANT SON VERRE, pas en perdant son opacité. Une opacité de 0,7
+   sur toute la carte ferait tomber --texte-doux sous le seuil de contraste, et
+   le client doit pouvoir relire ce qu'il a écarté — c'est même la seule trace
+   qu'il en garde. L'étiquette de statut, elle, porte le mot en clair. */
+.devisFige div.devisCarte {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+div.devisCarte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  height: 100%;
+  transition: border-color var(--duree-courte) var(--courbe);
+}
+
+/* La seule carte qui se distingue est celle que le lecteur a cochée. */
+.devisCoche div.devisCarte {
+  border-color: var(--accent-border);
+  box-shadow:
+    inset 0 1px 0 var(--verre-lisere),
+    0 0 0 1px var(--accent-border),
+    var(--ombre-2);
+}
+
+.devisHaut {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-3);
+}
+
+/* Le radio garde son apparence native : `accent-color` suffit à l'accorder à
+   la charte, et un faux radio dessiné en CSS perd le comportement clavier des
+   flèches dans un groupe. */
+.radio {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--primary);
+  flex: 0 0 auto;
+  margin: 0;
+  cursor: pointer;
+}
+
+.devisIdentite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-2);
+  flex: 1 1 10ch;
+  min-width: 0;
+}
+
+.devisArtisan {
+  font-size: var(--txt-md);
+  font-weight: 600;
+}
+
+/* « Pièces vérifiées » est une garantie de la plate-forme : rôle --or, comme
+   le badge vérifié de la charte. */
+.verifie {
+  padding: 0.1rem var(--espace-2);
+  border: 1px solid var(--or-border);
+  border-radius: var(--rayon-pleine);
+  background-color: var(--or-soft);
+  color: var(--or);
+  font-size: var(--txt-xs);
+  font-weight: 500;
+}
+
+/* ── Les trois grandeurs comparables ─────────────────────────────────────── */
+
+/* Une grille à trois colonnes égales, identique sur chaque carte : c'est
+   l'alignement qui rend la comparaison possible. */
+.grandeurs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: var(--espace-3);
+  padding-block: var(--espace-2);
+  border-block: 1px solid var(--verre-bordure);
+  margin: 0;
+}
+
+.grandeur {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  min-width: 0;
+}
+
+.grandeurNom {
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+}
+
+.grandeurValeur {
+  margin: 0;
+}
+
+.grandeurAbsente {
+  color: var(--texte-faible);
+}
+
+/* ── Le message de l'artisan ─────────────────────────────────────────────── */
+
+.devisMessage {
+  white-space: pre-line;
+  color: var(--texte-doux);
+  flex: 1 1 auto;
+}
+
+.devisPied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espace-2) var(--espace-4);
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+.lienFiche {
+  color: var(--accent-texte);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE PANNEAU DE DÉCISION
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.decision {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-4);
+  /* Le liseré d'accent le détache de la grille de devis : ce n'est plus une
+     proposition à lire, c'est le geste à faire. */
+  border-color: var(--accent-border);
+}
+
+.decisionTitre {
+  font-size: var(--txt-md);
+  font-weight: 600;
+}
+
+/* Les trois conséquences. L'or — rôle « attention » de la charte, qui ne
+   croise aucun montant dans ce bloc — plutôt que le rouge : accepter un devis
+   n'est pas une erreur, c'est une décision qui ne se reprend pas. */
+.decisionPhrase {
+  max-width: 72ch;
+  padding: var(--espace-3) var(--espace-4);
+  border: 1px solid var(--or-border);
+  border-left-width: 3px;
+  border-radius: var(--rayon-sm);
+  background-color: var(--or-soft);
+  color: var(--texte);
+}
+
+/* ── Le créneau ──────────────────────────────────────────────────────────── */
+
+.creneau {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  width: 100%;
+  padding: var(--espace-4);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-md);
+  background-color: var(--verre-fond);
+  margin: 0;
+  min-width: 0;
+}
+
+.creneauTitre {
+  padding: 0 var(--espace-2);
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.creneauPhrase {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.creneauChamps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--espace-4);
+}
+
+.creneauChamp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+  min-width: 0;
+}
+
+.creneauLibelle {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+}
+
+/* ── Le récapitulatif et la case de confirmation ─────────────────────────── */
+
+.recapitulatif {
+  max-width: 72ch;
+}
+
+.confirmation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+}
+
+.confirmationLibelle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-3);
+  max-width: 72ch;
+  cursor: pointer;
+}
+
+.caseConfirmation {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--primary);
+  flex: 0 0 auto;
+  /* Aligné sur la première ligne du libellé, et non sur son centre : le
+     libellé passe à deux lignes sur téléphone. */
+  margin-top: 0.2rem;
+}
+
+.erreurChamp {
+  font-size: var(--txt-sm);
+  color: var(--rouge);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES ÉTATS SANS DÉCISION
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.attribue,
+div.clos,
+div.aucunDevis,
+div.panne {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-4);
+}
+
+/* Le chantier est attribué : rôle --vert de la charte, celui de « accepté ».
+   C'est un aboutissement, pas un avertissement. */
+div.attribue {
+  border-color: var(--vert-border);
+}
+
+.attribueTexte {
+  max-width: 72ch;
+  color: var(--texte-doux);
+}
+
+/* La panne se distingue par un liseré et non par un fond rouge : l'écran
+   annonce un échec de LECTURE, pas la perte du chantier. */
+div.panne {
+  border-color: var(--rouge-border);
+}
+
+.panneTitre {
+  font-size: var(--txt-lg);
+}
+
+.panneTexte {
+  max-width: 72ch;
+  color: var(--texte-doux);
+}

@@ -1,0 +1,355 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /inscription ET /inscription/artisan
+
+   Un seul module pour les deux parcours, le sélecteur qui les relie et leurs
+   deux formulaires. C'est le but : les deux pages doivent avoir exactement la
+   même forme, et la seule façon d'en être sûr est qu'il n'existe qu'une
+   déclaration. La feuille est importée par `artisan/page.tsx` avec
+   `../page.module.css`.
+
+   Aucune couleur écrite en dur : tout est var(--…), défini dans
+   app/globals.css d'après CHARTE.md. --accent-texte pour le texte d'accent,
+   --primary pour les fonds, les traits et le focus.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  width: 100%;
+  max-width: 34rem;
+  margin-inline: auto;
+  padding: var(--espace-6) var(--espace-4) var(--espace-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+/* Le parcours artisan a trois blocs et treize champs : la colonne s'élargit
+   pour que les deux colonnes de champs du grand écran respirent. Le parcours
+   du particulier garde la colonne étroite — quatre champs dans 54 rem
+   paraîtraient perdus. */
+.pageLarge {
+  max-width: 46rem;
+}
+
+.retour {
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.retour a {
+  color: var(--texte-doux);
+}
+
+.retour a:hover {
+  color: var(--accent-texte);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   L'OUVERTURE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.ouverture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.titre {
+  font-size: var(--txt-xl);
+}
+
+.chapeau {
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+  max-width: 54ch;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE SÉLECTEUR DE PARCOURS
+
+   Deux surfaces de même largeur, dont une seule est un lien. La voie courante
+   n'est pas une ancre (voir Choix.tsx) : les deux styles doivent donc se
+   ressembler sans partager de balise, d'où la classe commune
+   `.etiquetteVoie`.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Le <nav> n'a pas de mise en page propre : c'est la liste qu'il contient qui
+   porte la grille. Il existe quand même, pour que son `aria-label` dise à
+   quoi servent ces deux surfaces. */
+.choix {
+  display: block;
+}
+
+.voies {
+  display: grid;
+  /* `minmax(0, 1fr)` et non `1fr` : sans le minimum à zéro, une colonne de
+     grille refuse de rétrécir sous la largeur intrinsèque de son texte, et la
+     paire déborde sur un petit téléphone. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espace-3);
+  list-style: none;
+}
+
+.voie {
+  display: flex;
+  min-width: 0;
+}
+
+.etiquetteVoie {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  padding: var(--espace-3) var(--espace-4);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-md);
+  background-color: var(--verre-fond);
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    border-color var(--duree-courte) var(--courbe),
+    color var(--duree-courte) var(--courbe);
+}
+
+/* `a.etiquetteVoie` : la règle de globals.css pour `a:hover` est faite d'un
+   élément et d'une pseudo-classe, donc plus spécifique qu'une classe seule.
+   Sans la balise ici, le survol remettrait la teinte d'ancre et le
+   soulignement sur toute la surface. */
+a.etiquetteVoie:hover {
+  border-color: var(--glass-border-hover);
+  color: var(--texte);
+  text-decoration: none;
+}
+
+/* La voie courante : fond d'accent et trait d'accent — les deux rôles de
+   --primary. Le TEXTE, lui, passe en --accent-texte, parce que --primary
+   posé sur --accent-soft tombe à 3,2:1. */
+.voieCourante {
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+  color: var(--accent-texte);
+  /* Un curseur par défaut : ce n'est pas un lien, et promettre un clic qui ne
+     mène nulle part est le défaut que Choix.tsx évite dans le balisage. */
+  cursor: default;
+}
+
+.precisionVoie {
+  font-size: var(--txt-xs);
+  font-weight: 400;
+  color: var(--texte-faible);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE PANNEAU
+
+   `section.panneau` et non `.panneau` : la carte reçoit `.carte` de
+   Carte.module.css, qui pose `display: block`. Deux sélecteurs d'une seule
+   classe se départagent par l'ordre des feuilles, lequel dépend de l'ordre
+   des imports — une dépendance invisible. « Élément + classe » l'emporte par
+   spécificité, donc quel que soit cet ordre.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+section.panneau {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.titrePanneau {
+  font-size: var(--txt-md);
+}
+
+.chapeauPanneau {
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+  max-width: 62ch;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES FORMULAIRES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+  margin-top: var(--espace-3);
+}
+
+/* ── Les trois blocs du parcours artisan ─────────────────────────────────
+   Un trait de séparation en haut plutôt qu'un cadre : treize champs répartis
+   dans trois cartes imbriquées empileraient trois épaisseurs de verre, et le
+   verre sur du verre perd le flou qui le définit. */
+.bloc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.bloc + .bloc {
+  padding-top: var(--espace-5);
+  border-top: 1px solid var(--verre-bordure);
+}
+
+.titreBloc {
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  /* Le surtitre d'un bloc porte du TEXTE : --accent-texte, et non --primary.
+     C'est la correction payée six fois en revue sur le socle. */
+  color: var(--accent-texte);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE GROUPE DE CASES À COCHER
+
+   `fieldset` arrive avec une bordure, un remplissage et une largeur
+   intrinsèque imposés par le navigateur — trois valeurs que la
+   réinitialisation de globals.css ne touche pas, parce qu'elle ne remet à
+   zéro que marges et remplissages. D'où le `border: 0` et le `min-inline-size`
+   ci-dessous : sans le second, un fieldset refuse de rétrécir sous la largeur
+   de son contenu, et déborde de la carte sur un téléphone.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.groupe {
+  border: 0;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+}
+
+/* `legend` ne se place pas comme un bloc ordinaire tant qu'il reste la légende
+   d'un cadre ; le fieldset n'en ayant plus, elle se comporte ici en simple
+   ligne de texte. Les valeurs doublent `.libelle` de Champ.module.css, parce
+   qu'un module CSS ne s'étend pas d'un fichier à l'autre et qu'un `composes`
+   depuis components/ ferait de ce fichier le propriétaire d'une feuille qui
+   n'est pas la sienne. */
+.legende {
+  padding: 0;
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  color: var(--texte-doux);
+}
+
+/* L'astérisque emprunte le rôle « action » et non le rouge : elle signale une
+   exigence, pas une erreur. Même valeur que Champ.module.css. */
+.marqueur {
+  margin-left: 0.2em;
+  color: var(--primary);
+}
+
+.aideGroupe {
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+  line-height: var(--interligne-normal);
+}
+
+.cases {
+  display: grid;
+  /* `auto-fill` et non un nombre de colonnes : huit métiers tiennent en deux
+     colonnes sur un téléphone et en quatre sur un écran large, sans point de
+     rupture à choisir. */
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: var(--espace-2);
+  margin-top: var(--espace-1);
+}
+
+/* L'étiquette enveloppe la case : toute la surface est cliquable. */
+.caseMetier {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+  padding: var(--espace-2) var(--espace-3);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-sm);
+  background-color: var(--verre-fond-haut);
+  font-size: var(--txt-sm);
+  cursor: pointer;
+  transition: border-color var(--duree-courte) var(--courbe);
+}
+
+.caseMetier:hover {
+  border-color: var(--accent-border);
+}
+
+/* `:has()` sur la case cochée : la surface entière prend l'accent, et non la
+   seule petite case du système. C'est la même information, lisible de plus
+   loin. La couleur n'est pas le seul indice — la case reste cochée. */
+.caseMetier:has(input:checked) {
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+}
+
+/* Le contour de focus est posé par :focus-visible dans globals.css, mais il
+   entoure la petite case et non l'étiquette : sur une surface de 9,5 rem, le
+   repère visuel serait au mauvais endroit. */
+.caseMetier:has(input:focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Un refus qui porte sur un groupe et non sur un contrôle unique : même
+   apparence que `.erreur` de Champ.module.css, losange compris, pour qu'une
+   erreur de groupe et une erreur de champ se lisent de la même façon. */
+.erreurGroupe {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-1);
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  color: var(--rouge);
+  line-height: var(--interligne-normal);
+}
+
+.erreurGroupe::before {
+  content: '\25c6';
+  flex: none;
+  font-size: 0.8em;
+  line-height: 1.7;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE RELEVÉ DE POSITION
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.releve {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-3);
+  padding: var(--espace-3) var(--espace-4);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-sm);
+  background-color: var(--verre-fond);
+}
+
+.etatReleve {
+  flex: 1 1 16rem;
+  min-width: 0;
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+  line-height: var(--interligne-normal);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA BASCULE VERS LA CONNEXION
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.bascule {
+  text-align: center;
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.bascule a {
+  color: var(--accent-texte);
+  font-weight: 500;
+}
+
+.bascule a:hover {
+  text-decoration: underline;
+}

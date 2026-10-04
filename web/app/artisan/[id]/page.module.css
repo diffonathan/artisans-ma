@@ -1,0 +1,293 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /artisan/[id] — la fiche publique
+
+   Aucune couleur en dur : tout est var(--…), défini dans app/globals.css
+   d'après CHARTE.md. Azeret Mono n'arrive que par la classe globale
+   `.nombre` — rayon, nombre de métiers, compteur d'avis.
+
+   ── Spécificité : pourquoi `div.faits`, `li.avis` ─────────────────────────
+   `Carte` reçoit `.carte` de Carte.module.css, qui pose `display: block`.
+   Deux sélecteurs d'une seule classe se départagent par l'ORDRE des
+   feuilles, lequel dépend de l'ordre des imports — une dépendance invisible
+   qu'un réarrangement casserait sans erreur. `élément + classe` l'emporte par
+   spécificité, donc toujours.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.retour {
+  font-size: var(--txt-sm);
+}
+
+/* Le lien de retour prend le texte d'accent et non --primary : la leçon de
+   contraste de CHARTE.md — --primary tombe à 3,2:1 sur le verre, et ce lien
+   est du texte de 14 px. */
+.retour a {
+  color: var(--accent-texte);
+}
+
+.fiche {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA TÊTE DE FICHE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.tete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.titreLigne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-3);
+}
+
+.raisonSociale {
+  font-size: var(--txt-xl);
+}
+
+.metiers {
+  color: var(--accent-texte);
+}
+
+.noteFiche {
+  align-self: flex-start;
+}
+
+/* ── Le badge « vérifié » ──────────────────────────────────────────────────
+   Rôle « valeur » de la charte, donc --or : CHARTE.md lui confie
+   explicitement le badge « vérifié », à côté des montants. */
+
+.verifie {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-1);
+  flex: none;
+  padding: 0.2rem 0.6rem;
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  color: var(--or);
+  background-color: var(--or-soft);
+  border: 1px solid var(--or-border);
+  border-radius: var(--rayon-pleine);
+}
+
+.pictoVerifie {
+  width: 0.85em;
+  height: 0.85em;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   « NE PREND PAS DE NOUVEAUX CHANTIERS »
+
+   Volontairement sans couleur de rôle : ce n'est ni une erreur (--rouge) ni
+   une mise en garde (--or, déjà pris par le badge au-dessus). Un liseré en
+   teinte de texte suffit à détacher l'information sans la dramatiser.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.inactif {
+  border-left: 3px solid var(--texte-faible);
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES FAITS : POINT D'ATTACHE, RAYON, MÉTIERS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.faits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.liste {
+  display: grid;
+  /* `auto-fit` : trois faits passent de 3 à 1 colonne sans requête de média.
+     11rem est la largeur en dessous de laquelle « Rayon d'intervention » se
+     coupe en trois lignes. */
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--espace-4);
+}
+
+.fait {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  min-width: 0;
+}
+
+.cle {
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+}
+
+.valeur {
+  font-size: var(--txt-md);
+}
+
+.explication {
+  /* Le raisonnement du produit, en petit : il explique le chiffre au-dessus
+     sans lui disputer la place. */
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+  max-width: 70ch;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES AVIS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.sectionAvis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.titreAvis {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-3);
+}
+
+/* Le compteur est une pastille de nombre : rôle « action » en fond, texte
+   clair. Pas --or, qui dirait « valeur » là où il s'agit d'un décompte. */
+.compteAvis {
+  padding: 0.05rem 0.55rem;
+  font-size: var(--txt-sm);
+  color: var(--accent-texte);
+  background-color: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-pleine);
+}
+
+.garantie {
+  max-width: 78ch;
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.avisListe {
+  list-style: none;
+  display: grid;
+  /* 20rem : un commentaire a besoin d'une ligne lisible, donc deux colonnes
+     au plus sur une page de 1180 px. */
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: var(--espace-4);
+}
+
+li.avis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  min-width: 0;
+}
+
+.avisTete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-2) var(--espace-4);
+}
+
+.avisAuteur {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.avisDate {
+  color: var(--texte-faible);
+}
+
+.avisCommentaire {
+  /* Un commentaire est de la prose : DM Sans, interligne de lecture, et
+     surtout `overflow-wrap` — un client peut coller une référence de trente
+     caractères sans espace, qui déborderait de la carte. */
+  line-height: var(--interligne-normal);
+  overflow-wrap: anywhere;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA SUITE DU PARCOURS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.suite {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  border-left: 3px solid var(--primary);
+}
+
+.titreSuite {
+  font-size: var(--txt-lg);
+}
+
+.texteSuite {
+  max-width: 70ch;
+  color: var(--texte-doux);
+}
+
+.actionsSuite {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-3);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES ÉTATS : AUCUN AVIS, FICHE ILLISIBLE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.etat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  max-width: 70ch;
+}
+
+.etatTitre {
+  font-size: var(--txt-lg);
+}
+
+.etatTexte {
+  color: var(--texte-doux);
+}
+
+.etatRemarque {
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+.etatActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-3);
+}
+
+div.etatPanne {
+  border-color: var(--rouge-border);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TÉLÉPHONE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 36rem) {
+  .actionsSuite,
+  .etatActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

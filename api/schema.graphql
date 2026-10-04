@@ -1,0 +1,296 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Artisan {
+  _id: ID!
+  actif: Boolean!
+
+  """Distance au besoin recherché, en mètres."""
+  distanceMetres: Float
+  metiers: [Metier!]!
+  nombreAvis: Int!
+  noteMoyenne: Float!
+  position: Position!
+  raisonSociale: String!
+  rayonKm: Int!
+
+  """Le compte propriétaire du profil."""
+  titulaire: Compte
+
+  """Pièces justificatives contrôlées par l'équipe."""
+  verifie: Boolean!
+  ville: String!
+}
+
+type Avis {
+  _id: ID!
+  commentaire: String!
+  createdAt: DateTime!
+
+  """Prénom et initiale de l'auteur."""
+  nomAuteur: String!
+  note: Int!
+}
+
+type Besoin {
+  _id: ID!
+
+  """
+  Adresse exacte du chantier. Rendue au seul propriétaire ; l'artisan retenu la lit sur la réservation.
+  """
+  adresse: String
+  budgetMaxCentimes: Int
+  createdAt: DateTime!
+
+  """
+  Le compte du demandeur, avec ses coordonnées. Rendu au seul propriétaire du besoin.
+  """
+  demandeur: Compte
+  description: String!
+  devisRecus: [Devis!]!
+  distanceMetres: Float
+  metier: Metier!
+
+  """Prénom et initiale du demandeur."""
+  nomDemandeur: String!
+  position: Position!
+  statut: StatutBesoin!
+  titre: String!
+}
+
+type Compte {
+  _id: ID!
+  createdAt: DateTime!
+  email: String!
+  nom: String!
+  role: Role!
+  telephone: String
+}
+
+type Creneau {
+  debut: DateTime!
+  fin: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Devis {
+  _id: ID!
+  auteur: Artisan
+  chantier: Besoin
+  createdAt: DateTime!
+  delaiJours: Int!
+  message: String!
+  montantCentimes: Int!
+  statut: StatutDevis!
+}
+
+input EntreeAvisGql {
+  commentaire: String!
+  note: Int!
+  reservation: ID!
+}
+
+input EntreeBesoinGql {
+  adresse: String!
+
+  """Budget maximal, en centimes."""
+  budgetMaxCentimes: Int
+  description: String!
+  latitude: Float!
+  longitude: Float!
+  metier: Metier!
+  titre: String!
+}
+
+input EntreeCreneau {
+  debut: DateTime!
+  fin: DateTime!
+}
+
+input EntreeDevisGql {
+  besoin: ID!
+  delaiJours: Int!
+  message: String!
+
+  """Montant total, en centimes."""
+  montantCentimes: Int!
+}
+
+input EntreeInscriptionArtisanGql {
+  email: String!
+  latitude: Float!
+  longitude: Float!
+  metiers: [Metier!]!
+  motDePasse: String!
+  nom: String!
+  raisonSociale: String!
+  rayonKm: Int!
+  telephone: String
+  ville: String!
+}
+
+input EntreeInscriptionClient {
+  email: String!
+  motDePasse: String!
+  nom: String!
+  telephone: String
+}
+
+input EntreeRecherche {
+  """Dernier identifiant de la page précédente (pagination par curseur)."""
+  apres: ID
+  latitude: Float!
+  limite: Int = 20
+  longitude: Float!
+  metier: Metier!
+  noteMinimale: Float
+  verifieSeulement: Boolean
+}
+
+enum Metier {
+  CARRELAGE
+  CLIMATISATION
+  ELECTRICITE
+  MACONNERIE
+  MENUISERIE
+  PEINTURE
+  PLOMBERIE
+  SERRURERIE
+}
+
+type Mutation {
+  """
+  Accepte un devis : refuse les autres, attribue le besoin et crée la réservation — les quatre écritures dans une seule transaction.
+  """
+  accepterDevis(creneau: EntreeCreneau!, id: ID!): Reservation!
+  annulerReservation(id: ID!): Reservation!
+  connecter(email: String!, motDePasse: String!): Session!
+
+  """
+  Dépose un avis sur une prestation terminée. Le droit d'avis est consommé par comparaison-et-échange : deux dépôts simultanés, un seul passe.
+  """
+  deposerAvis(entree: EntreeAvisGql!): Avis!
+
+  """Crée un compte artisan ET son profil métier, en une seule transaction."""
+  inscrireArtisan(entree: EntreeInscriptionArtisanGql!): Session!
+
+  """Crée un compte client."""
+  inscrireClient(entree: EntreeInscriptionClient!): Session!
+
+  """
+  Marque la réservation comme payée. Rejouable sans effet : la seconde fois ne change rien. En production, cette bascule viendrait de la notification signée du prestataire, pas du client.
+  """
+  payerReservation(id: ID!, referencePaiement: String!): Reservation!
+
+  """Propose un devis sur un besoin ouvert."""
+  proposerDevis(entree: EntreeDevisGql!): Devis!
+
+  """Publie un besoin, visible des artisans du secteur."""
+  publierBesoin(entree: EntreeBesoinGql!): Besoin!
+
+  """Retire son devis — libère la place pour un autre."""
+  retirerDevis(id: ID!): Devis!
+
+  """Déclare la prestation terminée — c'est ce qui ouvre le droit d'avis."""
+  terminerPrestation(id: ID!): Reservation!
+}
+
+type Position {
+  """Latitude en degrés décimaux."""
+  latitude: Float!
+
+  """Longitude en degrés décimaux."""
+  longitude: Float!
+  type: String!
+}
+
+type Query {
+  """La fiche d'un artisan, par identifiant."""
+  artisan(id: ID!): Artisan!
+
+  """Les avis d'un artisan, du plus récent au plus ancien."""
+  avisDArtisan(artisan: ID!): [Avis!]!
+
+  """Un besoin par identifiant. Réservé aux comptes connectés."""
+  besoin(id: ID!): Besoin!
+
+  """Les chantiers ouverts dans mon rayon."""
+  besoinsPourMoi: [Besoin!]!
+
+  """Mes besoins, du plus récent au plus ancien."""
+  mesBesoins: [Besoin!]!
+
+  """Mes devis envoyés, du plus récent au plus ancien."""
+  mesDevis: [Devis!]!
+  mesReservations: [Reservation!]!
+
+  """Le compte authentifié."""
+  moi: Compte!
+
+  """Mon planning, par créneau croissant."""
+  monPlanning: [Reservation!]!
+
+  """Le profil artisan du compte authentifié, s'il en a un."""
+  monProfilArtisan: Artisan
+
+  """
+  Les artisans qui acceptent d'intervenir à la position donnée — selon LEUR rayon, pas selon un rayon imposé par la recherche.
+  """
+  rechercherArtisans(entree: EntreeRecherche!): [Artisan!]!
+}
+
+type Reservation {
+  _id: ID!
+
+  """Adresse du chantier, figée à l'acceptation du devis."""
+  adresseIntervention: String!
+  avisDeposeA: DateTime
+
+  """Le chantier concerné."""
+  chantier: Besoin
+  commissionCentimes: Int!
+  createdAt: DateTime!
+  creneau: Creneau!
+  demandeur: Compte
+  montantCentimes: Int!
+  prestataire: Artisan
+  statut: StatutReservation!
+}
+
+enum Role {
+  ADMIN
+  ARTISAN
+  CLIENT
+}
+
+type Session {
+  compte: Compte!
+
+  """Jeton à présenter dans l’en-tête Authorization: Bearer."""
+  jeton: String!
+}
+
+enum StatutBesoin {
+  ATTRIBUE
+  CLOS
+  OUVERT
+}
+
+enum StatutDevis {
+  ACCEPTE
+  ENVOYE
+  REFUSE
+  RETIRE
+}
+
+enum StatutReservation {
+  ANNULEE
+  A_PAYER
+  PAYEE
+  TERMINEE
+}

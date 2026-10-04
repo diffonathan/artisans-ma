@@ -1,0 +1,267 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /mon-compte
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  /* Ni largeur, ni marge, ni padding : le <main> de l'enveloppe
+     (`.contenu` dans Enveloppe.module.css) pose déjà exactement cette
+     largeur de page et ce rembourrage. Les redéclarer ici doublait la
+     gouttière latérale et resserrait le contenu de ces quatre pages par
+     rapport à toutes les autres. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+}
+
+.ouverture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.titre {
+  font-size: var(--txt-xl);
+  line-height: var(--interligne-serre);
+  font-weight: 600;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.titreSection {
+  font-size: var(--txt-lg);
+  font-weight: 600;
+}
+
+/* ── Les repères chiffrés ───────────────────────────────────────────────── */
+
+.reperes {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--espace-4);
+}
+
+/* Le verre, son liseré et sa réaction au survol viennent de `CarteLien`.
+   Ce module ne pose que la mise en page de l'intérieur de la tuile. */
+.repere {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  height: 100%;
+}
+
+/* Le chiffre est un nombre : `.nombre` lui donne Azeret Mono, et la couleur
+   d'accent en TEXTE passe par --accent-texte, jamais par --primary. */
+.repereValeur {
+  font-size: var(--txt-xl);
+  line-height: 1;
+  font-weight: 600;
+  color: var(--accent-texte);
+}
+
+.repereLibelle {
+  font-size: var(--txt-sm);
+  color: var(--texte);
+}
+
+.reperePrecision {
+  font-size: var(--txt-xs);
+  line-height: var(--interligne-normal);
+  color: var(--texte-faible);
+}
+
+.repereFantome {
+  display: block;
+  height: 7.5rem;
+  border-radius: var(--rayon-lg);
+  background-color: var(--verre-fond-haut);
+  animation: respiration 1600ms var(--courbe) infinite;
+}
+
+.echecReperes {
+  padding: var(--espace-3);
+  border: 1px solid var(--rouge-border);
+  border-radius: var(--rayon-sm);
+  background-color: var(--rouge-soft);
+  color: var(--rouge);
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+}
+
+/* ── Les blocs d'identité ───────────────────────────────────────────────── */
+
+.blocs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: var(--espace-4);
+  align-items: start;
+}
+
+.bloc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.titreBloc {
+  font-size: var(--txt-md);
+  line-height: var(--interligne-serre);
+  font-weight: 600;
+}
+
+.enTeteProfil {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espace-3);
+  flex-wrap: wrap;
+}
+
+/* « Vérifié » est une VALEUR contrôlée par l'équipe : rôle --or, comme le dit
+   la charte. */
+.verifie {
+  padding: var(--espace-1) var(--espace-3);
+  border: 1px solid var(--or-border);
+  border-radius: var(--rayon-pleine);
+  background-color: var(--or-soft);
+  color: var(--or);
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.enVerification {
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+  white-space: nowrap;
+}
+
+.metiers {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+}
+
+.metier {
+  padding: var(--espace-1) var(--espace-3);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-pleine);
+  background-color: var(--accent-soft);
+  color: var(--accent-texte);
+  font-size: var(--txt-xs);
+  font-weight: 500;
+}
+
+.paires {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-5);
+}
+
+.paire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  min-width: 0;
+}
+
+.paire dt {
+  font-size: var(--txt-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+}
+
+.paire dd {
+  font-size: var(--txt-sm);
+  color: var(--texte);
+  /* Une adresse électronique longue ne doit pas élargir la carte. */
+  overflow-wrap: anywhere;
+}
+
+.telephone {
+  color: var(--accent-texte);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.telephone:hover {
+  color: var(--texte);
+}
+
+.absent {
+  color: var(--texte-faible);
+}
+
+.explication {
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+  max-width: 72ch;
+}
+
+.inactif {
+  padding: var(--espace-3);
+  border: 1px solid var(--rouge-border);
+  border-radius: var(--rayon-sm);
+  background-color: var(--rouge-soft);
+  color: var(--rouge);
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+}
+
+/* ── L'erreur de l'écran entier ─────────────────────────────────────────── */
+
+.etatEchec {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-3);
+  max-width: 62ch;
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+}
+
+.phraseEchec {
+  color: var(--rouge);
+}
+
+@keyframes respiration {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .repereFantome {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: var(--espace-5) var(--espace-4) var(--espace-7);
+  }
+
+  .reperes,
+  .blocs {
+    grid-template-columns: 1fr;
+  }
+}

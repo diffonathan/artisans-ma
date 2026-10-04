@@ -1,0 +1,60 @@
+/* Aucune couleur en dur : tout vient des jetons de CHARTE.md. */
+
+.page {
+  /* Pas de `padding` : le <main> de l'enveloppe en pose déjà un. */
+  display: flex;
+  justify-content: center;
+}
+
+.bloc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+  /* Mesure de lecture : un refus se lit en entier ou ne se lit pas. */
+  max-width: 44rem;
+}
+
+/* --accent-texte et non --primary : petites capitales à 0,875 rem posées sur
+   le verre, soit exactement le cas où la teinte moyenne tombe sous le seuil.
+   C'est la leçon de contraste de CHARTE.md. */
+.surtitre {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.titre {
+  font-size: var(--txt-xl);
+  font-weight: 600;
+  line-height: var(--interligne-serre);
+  letter-spacing: -0.02em;
+}
+
+/* Le chemin demandé. Azeret Mono serait un contresens — la charte la réserve
+   aux NOMBRES, et un chemin d'URL n'en est pas un. Il est distingué par son
+   fond et son liseré. */
+.route {
+  padding: 0.1em 0.4em;
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-xs);
+  background-color: var(--verre-fond-haut);
+  /* Un chemin long se coupe plutôt que d'élargir le bloc. */
+  overflow-wrap: anywhere;
+}
+
+.explication {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+}
+
+.issues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-3);
+}

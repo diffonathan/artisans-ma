@@ -1,0 +1,61 @@
+/* Ce module ne décrit QUE l'enveloppe, l'étiquette, l'aide et l'erreur. Les
+   contrôles eux-mêmes sont habillés par la recette globale de globals.css —
+   y compris le chevron du select, qu'une déclaration de fond écrite ici
+   effacerait. */
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+  /* Sans cela, un champ placé dans une grille refuse de rétrécir sous la
+     largeur intrinsèque de son étiquette. */
+  min-width: 0;
+}
+
+.libelle {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  color: var(--texte-doux);
+  /* Le clic sur l'étiquette donne le focus au champ : la zone cliquable ne
+     doit donc pas s'étendre à toute la largeur de la colonne, où un clic dans
+     le vide déplacerait le curseur sans raison apparente. */
+  align-self: flex-start;
+  cursor: pointer;
+}
+
+/* L'astérisque emprunte le rôle « action » et non le rouge : elle signale une
+   exigence, pas une erreur. Le rouge avant toute saisie ferait lire un
+   formulaire vierge comme un formulaire fautif. */
+.marqueur {
+  margin-left: 0.2em;
+  color: var(--primary);
+}
+
+.aide {
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+  line-height: var(--interligne-normal);
+}
+
+.erreur {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-1);
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  color: var(--rouge);
+  line-height: var(--interligne-normal);
+}
+
+/* Le losange est une redondance VOLONTAIRE : la couleur seule ne distingue
+   pas une aide d'une erreur pour un lecteur daltonien, et le message est déjà
+   annoncé par role="alert" à qui ne voit pas la page. */
+.erreur::before {
+  content: '\25c6';
+  flex: none;
+  font-size: 0.8em;
+  line-height: 1.7;
+}
+
+/* Le texte réservé aux lecteurs d'écran est la classe globale
+   `.lecture-seule` de globals.css : voir Champ.tsx. */

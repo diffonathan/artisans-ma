@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 2 60 60" width="60" height="60">
+  <!-- ICÔNE D'ONGLET. Next 16 ramasse `app/icon.svg` comme FICHIER IMAGE (la
+       convention admet .ico/.jpg/.jpeg/.png/.svg à ce nom) et émet lui-même,
+       dans le <head> de chaque page, le
+       <link rel="icon" href="/icon.svg?<empreinte>" sizes="any"
+             type="image/svg+xml">. Aucun export, aucun composant : un icon.tsx
+       servirait à GÉNÉRER un PNG par ImageResponse, ce qui serait un détour
+       pour un dessin déjà vectoriel.
+
+       Condition à ne pas casser : `app/layout.tsx` ne doit déclarer AUCUNE clé
+       `icons` dans son `metadata`. Contrairement à ce qu'annonce la doc de
+       generate-metadata, resolve-metadata.js ne verse les icônes de convention
+       que sous `if (!resolvedMetadata.icons)` : un objet, même minimal, jette
+       ce fichier en silence et l'onglet cesse de ressembler à l'en-tête.
+
+       Conséquences du contexte image, qui dictent tout le fichier :
+         . ni var(), ni currentColor, ni police — rien du document ne parvient
+           ici. Les trois couleurs sont donc écrites en clair, et ce sont les
+           valeurs de CHARTE.md : #f9a825 (or), #7ac4be vers #0a736a (les deux
+           arrêts du jeton grad-accent), #ffffff. Avec app/globals.css, les
+           fichiers de marque sont les seuls endroits du front où une couleur
+           est littérale ;
+         . pas de <title> : hors de l'arbre d'accessibilité, personne ne le lit ;
+           le nom de l'onglet vient du <title> du layout.
+
+       Cadrage resserré à « 2 2 60 60 » au lieu de « 0 0 64 64 » : le navigateur
+       ajoute déjà sa propre marge autour de la favicon, et la nôtre ne faisait
+       que la doubler. L'encre gagne ainsi 7 % sans que la plaque touche le bord
+       (emprise réelle 6 à 58, donc 4 unités de garde de chaque côté). La
+       géométrie, elle, est celle de brand/logo.svg à l'unité près.
+
+       Aucune tuile nuit sous la marque, bien que le projet soit nuit seule : le
+       poinçon est un aplat à frontière extérieure d'or franche, qui tient donc
+       sur une barre d'onglets claire comme sombre. Une tuile n'ajouterait qu'un
+       carré arrondi de plus, que le navigateur recadrerait à sa façon. -->
+  <linearGradient id="artisans-icone-champ" gradientUnits="userSpaceOnUse"
+                  x1="36.9" y1="50.4" x2="27.1" y2="13.6">
+    <stop offset="0" stop-color="#7ac4be"/>
+    <stop offset="1" stop-color="#0a736a"/>
+  </linearGradient>
+
+  <path d="M20 7 Q32 5 44 7 Q57 7 57 20 Q59 32 57 44 Q57 57 44 57 Q32 59 20 57 Q7 57 7 44 Q5 32 7 20 Q7 7 20 7 Z" fill="#f9a825"/>
+  <path d="M22.16 11.5 Q32 9.86 41.84 11.5 Q52.5 11.5 52.5 22.16 Q54.14 32 52.5 41.84 Q52.5 52.5 41.84 52.5 Q32 54.14 22.16 52.5 Q11.5 52.5 11.5 41.84 Q9.86 32 11.5 22.16 Q11.5 11.5 22.16 11.5 Z" fill="url(#artisans-icone-champ)"/>
+  <path d="M21.5 32.5 L29.9 40.9 L42.1 24.7" fill="none" stroke="#ffffff"
+        stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

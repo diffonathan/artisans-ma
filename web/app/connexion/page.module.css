@@ -1,0 +1,110 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /connexion
+
+   Une colonne étroite, centrée verticalement sur un grand écran et simplement
+   posée en haut sur un téléphone. Aucune couleur écrite en dur : tout est
+   var(--…), défini dans app/globals.css d'après CHARTE.md.
+
+   ── Les classes .formulaire et .refus sont consommées par Formulaire.tsx ──
+   Un module CSS appartient au dossier, pas au fichier : le composant client
+   et la page serveur du même dossier l'importent tous les deux. C'est aussi
+   ce qui garantit que les deux parcours d'inscription, dans leur propre
+   dossier, aient un formulaire de la même forme sans qu'une déclaration soit
+   recopiée.
+
+   ── Spécificité : pourquoi `section.panneau` ─────────────────────────────
+   La carte reçoit `.carte` de Carte.module.css, qui pose `display: block`.
+   Deux sélecteurs d'une seule classe se départagent par l'ORDRE des feuilles,
+   lequel dépend de l'ordre des imports du fichier qui les consomme — une
+   dépendance invisible qu'un réarrangement d'imports casserait sans erreur.
+   Un sélecteur « élément + classe » l'emporte par spécificité, donc quel que
+   soit cet ordre. Cette forme n'est employée QUE là.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  width: 100%;
+  max-width: 30rem;
+  /* `margin-inline: auto` et non un conteneur en flex : la page est le seul
+     enfant du body, lui-même en colonne flex, et `auto` suffit à la centrer
+     sans ajouter de nœud. */
+  margin-inline: auto;
+  padding: var(--espace-6) var(--espace-4) var(--espace-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+  /* Centré verticalement quand la hauteur le permet, et jamais comprimé :
+     `justify-content: center` sur un conteneur plus court que son contenu
+     ferait sortir le haut du formulaire de la zone défilable. */
+  flex: 1;
+  justify-content: center;
+}
+
+/* Le seul chemin de sortie : le nom du site, qui ramène à l'accueil. Discret
+   et non un bouton — ce n'est pas l'action attendue de cette page. */
+.retour {
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.retour a {
+  color: var(--texte-doux);
+}
+
+.retour a:hover {
+  /* --accent-texte et non --primary : du texte d'accent sur le fond nuit
+     tombe sous le seuil de contraste avec la teinte moyenne. CHARTE.md. */
+  color: var(--accent-texte);
+}
+
+section.panneau {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.titre {
+  /* Le titre d'un formulaire n'a pas besoin du corps d'un titre d'accueil :
+     il nomme la page, il ne la vend pas. */
+  font-size: var(--txt-xl);
+}
+
+.chapeau {
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE FORMULAIRE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+  /* Le bouton d'envoi est séparé des champs par plus d'air que les champs
+     entre eux : sans cela, il se lit comme un sixième champ. */
+  margin-top: var(--espace-2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA BASCULE VERS L'AUTRE PAGE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.bascule {
+  text-align: center;
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.bascule a {
+  color: var(--accent-texte);
+  font-weight: 500;
+}
+
+/* Le soulignement vient en plus de l'éclaircissement : l'indice ne doit pas
+   reposer sur la seule couleur. Repris de globals.css parce que la règle
+   d'origine cible `a:hover` et que celle-ci est plus spécifique. */
+.bascule a:hover {
+  text-decoration: underline;
+}

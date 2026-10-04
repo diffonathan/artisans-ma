@@ -1,0 +1,23 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Sorties de Next. `web/.gitignore` les couvre déjà ; elles sont répétées ici
+# pour qu'une commande lancée depuis la racine ne les ramasse pas si le
+# fichier du sous-dossier venait à disparaître.
+.next/
+web/out/
+
+.env
+.env.local
+.env.*.local
+
+# Produit par NestJS au démarrage, à partir des classes TypeScript. Il est
+# suivi en revanche : voir api/schema.graphql, qui est VERSIONNÉ exprès —
+# un changement du schéma public doit être visible dans un diff.
+!api/schema.graphql
+
+.DS_Store
+Thumbs.db
+*.log

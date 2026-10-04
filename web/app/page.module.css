@@ -1,0 +1,434 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'ACCUEIL, le 404 et la page d'erreur
+
+   Un seul module pour les trois, parce que les deux pages d'état ne
+   partagent rien avec le reste de l'application et tout avec elles-mêmes :
+   une carte centrée, un code, un titre, deux chemins de retour. Leurs
+   classes sont préfixées `etat`.
+
+   Aucune couleur en dur : tout est var(--…), défini dans app/globals.css
+   d'après CHARTE.md.
+
+   ── Spécificité : pourquoi `div.garantie` et non `.garantie` ──────────────
+   Les cartes reçoivent `.carte` de Carte.module.css, qui pose
+   `display: block`. Deux sélecteurs d'une seule classe se départagent par
+   l'ORDRE des feuilles, lequel dépend de l'ordre des imports du fichier qui
+   les consomme — une dépendance invisible, qu'un futur réarrangement
+   d'imports casserait sans erreur. Un sélecteur `élément + classe` l'emporte
+   par spécificité, donc indépendamment de l'ordre. Cette forme n'est
+   employée QUE là où il faut vaincre `display: block`.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.accueil {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-8);
+  padding-block: var(--espace-7) var(--espace-8);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1. L'OUVERTURE — le problème, avant toute solution
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.ouverture {
+  /* Une colonne de texte étroite : les trois phrases du problème doivent se
+     lire d'un trait, et une ligne de 100 caractères se relit deux fois. */
+  max-width: 62ch;
+}
+
+/* --accent-texte et non --primary. C'est la leçon de contraste de CHARTE.md :
+   --primary est une teinte MOYENNE, qui convient aux fonds, aux traits et au
+   contour de focus, et qui tombe à 3,2:1 dès qu'elle porte du TEXTE sur le
+   verre. Ce surtitre est en petites capitales à 0,875 rem, soit le texte le
+   plus exigeant de la page — et il était le seul endroit du projet à l'écrire
+   encore en --primary. Trois agents sur six l'ont signalé sans pouvoir le
+   corriger, le fichier n'étant pas le leur. */
+.surtitre {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+  margin-bottom: var(--espace-4);
+}
+
+.titre {
+  margin-bottom: var(--espace-5);
+}
+
+/* « chez vous » est le mot qui porte toute la thèse : l'artisan vient, ou il
+   ne vient pas. L'accent le souligne, et `font-style: normal` retire
+   l'italique du <em> — l'emphase est ici une couleur, pas une inclinaison. */
+.chezVous {
+  font-style: normal;
+  color: var(--primary);
+}
+
+.probleme {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  font-size: var(--txt-md);
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA REPRISE — visible des seuls comptes connectés
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.reprise {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espace-4);
+  /* Un liseré d'accent sur le bord d'attaque : c'est un rappel de parcours,
+     pas une carte de contenu, et il doit se distinguer sans crier. */
+  border-left: 3px solid var(--primary);
+}
+
+.reprisePhrase {
+  margin: 0;
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES SECTIONS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.titreSection {
+  max-width: 34ch;
+}
+
+.chapeau {
+  max-width: 62ch;
+  /* Annule l'écart de `.section` et le remplace par un plus serré : un
+     chapeau appartient à son titre, il ne forme pas un bloc de plus. */
+  margin-top: calc(var(--espace-2) - var(--espace-5));
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2. LES QUATRE ÉTAPES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.etapes {
+  list-style: none;
+  display: grid;
+  /* `auto-fit` et non un nombre de colonnes : quatre cartes passent de 4 à 2
+     à 1 colonne sans aucune requête de média. 15rem est la largeur en dessous
+     de laquelle le titre d'étape se coupe en trois lignes. */
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--espace-4);
+}
+
+li.etape {
+  display: flex;
+  flex-direction: column;
+  /* L'étiquette de statut est poussée en bas : les quatre pastilles
+     s'alignent alors sur une même ligne malgré des textes de longueurs
+     différentes, ce qui donne à lire la progression des couleurs. */
+  gap: var(--espace-3);
+  align-items: flex-start;
+}
+
+.rang {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: var(--rayon-pleine);
+  background-color: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  /* --accent-texte : le chiffre est posé sur --accent-soft dans une carte de
+     verre, et --primary y mesurait 3,6:1 à 14 px. C'est la seule chose qui
+     numérote les étapes, donc elle doit se lire. */
+  color: var(--accent-texte);
+  font-size: var(--txt-sm);
+  font-weight: 600;
+}
+
+.titreEtape {
+  font-size: var(--txt-md);
+}
+
+.texteEtape {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+  /* Pousse ce qui suit — l'étiquette, le comparatif — vers le bas de la
+     carte. `margin-top: auto` ne marcherait pas sur l'étiquette elle-même :
+     elle est `inline-flex` dans un conteneur `align-items: flex-start`. */
+  flex: 1 1 auto;
+}
+
+/* ── Le comparatif de l'étape 3 ───────────────────────────────────────────
+   Deux lignes, et les quatre rôles de couleur y sont ensemble : l'or du
+   montant, le vert de l'accepté, le rouge du refusé. C'est la démonstration
+   la plus courte de ce que « figé » et « refusé sans rien faire » veulent
+   dire. */
+
+.comparatif {
+  list-style: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+}
+
+.ligneComparatif {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-2);
+  padding: var(--espace-2) var(--espace-3);
+  background-color: var(--verre-fond-haut);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-sm);
+  font-size: var(--txt-sm);
+}
+
+.nomComparatif {
+  /* Prend la place restante, pour que montant et pastille se posent à droite
+     tant que la ligne tient, et passent dessous quand elle ne tient plus. */
+  flex: 1 1 8ch;
+  min-width: 0;
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. LA GARANTIE DES AVIS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.garantie {
+  display: grid;
+  grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+  gap: var(--espace-6);
+  align-items: start;
+}
+
+/* Une seule bascule dans tout le fichier, et elle est nécessaire : le reste
+   de la page se réorganise par `auto-fit`, mais ici les deux colonnes ne sont
+   pas interchangeables — la note doit rester AVANT les trois points, qui
+   l'expliquent. `auto-fit` ne garantit pas cet ordre sur une colonne. */
+@media (max-width: 54rem) {
+  div.garantie {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--espace-5);
+  }
+}
+
+.garantieNote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  padding: var(--espace-5);
+  background-color: var(--verre-fond-haut);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-md);
+}
+
+.garantieLegende {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.point {
+  position: relative;
+  padding-left: var(--espace-5);
+  color: var(--texte-doux);
+}
+
+/* La puce est une coche, reprise du poinçon de la marque : ces trois lignes
+   sont ce que le poinçon atteste. Dessinée en CSS et non en SVG, parce
+   qu'elle n'a que deux segments. */
+.point::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.55rem;
+  height: 0.3rem;
+  border-left: 2px solid var(--vert);
+  border-bottom: 2px solid var(--vert);
+  transform: rotate(-45deg);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4. LES DEUX ENTRÉES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.entrees {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--espace-4);
+}
+
+a.entree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.titreEntree {
+  font-size: var(--txt-lg);
+}
+
+.texteEntree {
+  color: var(--texte-doux);
+  flex: 1 1 auto;
+}
+
+/* `aria-hidden` sur l'élément : toute la carte est déjà un lien, et un lecteur
+   d'écran annoncerait sinon « Chercher près de chez moi » comme un second
+   lien à l'intérieur du premier. Visuellement, c'est l'appel à l'action. */
+.appel {
+  color: var(--primary);
+  font-weight: 500;
+  transition: transform var(--duree-moyenne) var(--courbe);
+}
+
+a.entree:hover .appel {
+  /* `translateX` sur l'appel seul : la carte, elle, monte déjà de 2px par
+     `.verre-interactif`. Les deux mouvements se lisent comme un seul geste. */
+  transform: translateX(4px);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5. LE BLOC TECHNIQUE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.technique {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.faits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--espace-5);
+}
+
+.fait {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+  min-width: 0;
+}
+
+/* --accent-texte : ces intitulés sont à --txt-xs, soit 12 px, où --primary
+   descend à 4,1:1 sur le verre sous le halo. .chezVous, lui, garde --primary :
+   il est dans le <h1>, où le seuil n'est que de 3:1. */
+.faitCle {
+  font-size: var(--txt-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.faitValeur {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* Du code est du code, pas un nombre : la police des nombres est réservée par
+   la charte, donc ce <code> prend la monospace de repli du système sans
+   passer par --police-nombres. Le code 404, lui, est bien un nombre : il porte
+   `.nombre` dans le balisage. */
+.code {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.92em;
+  padding: 0.05em 0.35em;
+  margin-inline: 0.15em;
+  background-color: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-xs);
+  color: var(--texte);
+}
+
+.depot {
+  padding-top: var(--espace-4);
+  border-top: 1px solid var(--verre-bordure);
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES PAGES D'ÉTAT — 404 et erreur
+
+   Elles sont leur propre <main>, sans en-tête ni pied : l'enveloppe est
+   montée par la page d'accueil, pas par la disposition racine.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.etat {
+  flex: 1 0 auto; /* Le body est une colonne flex : on occupe la hauteur. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  padding: var(--espace-7) var(--espace-4);
+}
+
+div.etatCarte {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-4);
+  max-width: 48ch;
+}
+
+.etatCode {
+  font-size: var(--txt-2xl);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--texte-faible);
+}
+
+/* Une erreur relève du rôle « baisse / refusé ». Un 404, non : une adresse
+   qui n'existe pas n'est pas une panne, et la peindre en rouge inquiéterait
+   pour rien — d'où --texte-faible au-dessus. */
+.etatCodeRouge {
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rouge);
+}
+
+.etatTitre {
+  font-size: var(--txt-xl);
+}
+
+.etatTexte {
+  color: var(--texte-doux);
+}
+
+.etatRepere {
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+.etatActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-3);
+  padding-top: var(--espace-2);
+}

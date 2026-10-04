@@ -1,0 +1,82 @@
+# Infrastructure de développement d'Artisans.ma.
+#
+# ── Pourquoi un replica set pour UN seul nœud ───────────────────────────────
+# MongoDB n'autorise les transactions multi-documents que sur un replica set.
+# En nœud unique « classique », `session.startTransaction()` échoue avec
+# « Transaction numbers are only allowed on a replica set member or mongos ».
+#
+# Ce n'est pas un détail d'infrastructure : c'est ce qui décide si le domaine
+# peut garantir qu'un avis n'existe jamais sans la réservation payée qui lui
+# donne droit. MongoDB n'a pas de clé étrangère — la transaction est le seul
+# outil qui reste pour écrire deux documents « tout ou rien ».
+#
+# D'où un replica set à un membre : le coût d'exploitation d'un nœud, les
+# garanties transactionnelles d'un cluster.
+
+services:
+  mongo:
+    image: mongo:8
+    container_name: artisans-mongo
+    # `--bind_ip_all` : sans cela, le nœud n'écoute que sur la boucle locale DU
+    # CONTENEUR et le replica set s'annonce sur une adresse injoignable.
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-donnees:/data/db
+    healthcheck:
+      # Le replica set s'initialise TOUT SEUL, au premier contrôle de santé.
+      # Un script d'initialisation séparé (`mongo-init`) demanderait un
+      # conteneur de plus qui s'arrête aussitôt, et laisserait l'application
+      # démarrer avant lui une fois sur deux.
+      #
+      # `rs.status()` lève tant que le jeu n'existe pas : on l'initialise dans
+      # le `catch`. Une fois en place, l'appel réussit et ne fait plus rien —
+      # la commande est donc rejouable à chaque contrôle sans effet.
+      test: >
+        mongosh --quiet --eval "
+          try { rs.status().ok }
+          catch (e) {
+            rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] })
+          }
+        "
+      # ── Deux rythmes, et pourquoi ──────────────────────────────────────
+      # `mongosh` est un client complet : chaque contrôle lance un processus
+      # Node, se connecte, exécute et s'arrête. Mesuré à vide sur ce poste,
+      # un contrôle toutes les 5 secondes maintient le conteneur à 68 % de
+      # CPU — en permanence, sans que rien ne tourne.
+      #
+      # Ce n'est pas gratuit : la suite de tests est gourmande en CPU
+      # (scrypt est memory-hard par construction), et elle se retrouve en
+      # concurrence avec un contrôle de santé qui ne sert plus à rien une
+      # fois le replica set en place.
+      #
+      # D'où `start_interval` : 2 secondes pendant le démarrage, pour que
+      # l'initialisation du jeu soit détectée vite, puis une minute en
+      # régime établi.
+      start_period: 40s
+      start_interval: 2s
+      interval: 60s
+      timeout: 15s
+      retries: 3
+
+  redis:
+    image: redis:8-alpine
+    container_name: artisans-redis
+    # `--appendonly yes` : le cache survit à un redémarrage du conteneur.
+    # En développement c'est du confort ; en production ce serait un choix à
+    # justifier, un cache perdu devant pouvoir se reconstruire.
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-donnees:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  mongo-donnees:
+  redis-donnees:

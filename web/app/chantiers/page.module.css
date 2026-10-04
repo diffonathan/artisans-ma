@@ -1,0 +1,231 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /chantiers
+
+   Aucune valeur de couleur ici : uniquement les jetons de `globals.css`, qui
+   viennent de CHARTE.md. Le texte d'accent passe par --accent-texte et jamais
+   par --primary, qui tombe sous le seuil de contraste dès qu'il se pose sur
+   le verre.
+
+   Ce module est aussi importé par `ProposerDevis.tsx` : le formulaire vit dans
+   la carte du chantier, donc dans la même grille.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  /* Ni largeur, ni marge, ni padding : le <main> de l'enveloppe
+     (`.contenu` dans Enveloppe.module.css) pose déjà exactement cette
+     largeur de page et ce rembourrage. Les redéclarer ici doublait la
+     gouttière latérale et resserrait le contenu de ces quatre pages par
+     rapport à toutes les autres. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+}
+
+/* ── Ouverture ──────────────────────────────────────────────────────────── */
+
+.ouverture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  max-width: 68ch;
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.titre {
+  font-size: var(--txt-xl);
+  line-height: var(--interligne-serre);
+  font-weight: 600;
+}
+
+.chapeau {
+  font-size: var(--txt-md);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+}
+
+/* La garantie faite au client n'est ni un avertissement ni une erreur : elle
+   est posée sur du verre, bordée à gauche par l'accent, et lue une fois. */
+.garantie {
+  border-left: 2px solid var(--accent-border);
+  padding: var(--espace-3) var(--espace-4);
+  background-color: var(--accent-soft);
+  border-radius: 0 var(--rayon-sm) var(--rayon-sm) 0;
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+}
+
+/* ── La liste ───────────────────────────────────────────────────────────── */
+
+.compte {
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+.liste {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: var(--espace-4);
+  align-items: start;
+}
+
+.chantier {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.enTeteChantier {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espace-3);
+}
+
+/* Pastille de métier : fond d'accent, texte en --accent-texte. --primary
+   reste sur la bordure, où il n'a pas à porter de contraste de texte. */
+.metier {
+  padding: var(--espace-1) var(--espace-3);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-pleine);
+  background-color: var(--accent-soft);
+  color: var(--accent-texte);
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.distance {
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+}
+
+.titreChantier {
+  font-size: var(--txt-md);
+  line-height: var(--interligne-serre);
+  font-weight: 600;
+}
+
+.provenance {
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+}
+
+.description {
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+  /* La description est libre : un pavé de deux mille signes ne doit pas faire
+     d'une carte une colonne de trois écrans. Elle est écrêtée à six lignes,
+     et le devis se discute ensuite. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
+}
+
+.budget {
+  font-size: var(--txt-sm);
+  display: flex;
+  align-items: baseline;
+  gap: var(--espace-1);
+  flex-wrap: wrap;
+}
+
+.libelleBudget {
+  color: var(--texte-doux);
+}
+
+.nuanceBudget {
+  color: var(--texte-faible);
+  font-size: var(--txt-xs);
+}
+
+.sansBudget {
+  color: var(--texte-faible);
+}
+
+.dejaChiffre {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-2);
+  padding-top: var(--espace-2);
+  border-top: 1px solid var(--verre-bordure);
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* ── Le formulaire de devis, dans la carte ──────────────────────────────── */
+
+.formulaireDevis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  padding-top: var(--espace-3);
+  border-top: 1px solid var(--verre-bordure);
+}
+
+.formulaireTitre {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  color: var(--accent-texte);
+}
+
+/* Deux colonnes quand la carte est large, une seule sinon. `minmax(0, …)`
+   et non `1fr` seul : un champ à `width: 100%` déborde sinon de sa colonne. */
+.formulaireLigne {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: var(--espace-3);
+}
+
+.formulaireActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+}
+
+/* ── Les états vide, erreur, chargement ─────────────────────────────────── */
+
+.etatVide,
+.etatEchec {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-3);
+  max-width: 62ch;
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+}
+
+.titreEtat {
+  font-size: var(--txt-md);
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.phraseEchec {
+  color: var(--rouge);
+}
+
+/* Une animation sans fin est exactement ce que ce réglage existe pour
+   éteindre : le squelette garde sa place, il cesse de bouger. */
+@media (max-width: 640px) {
+  .page {
+    padding: var(--espace-5) var(--espace-4) var(--espace-7);
+  }
+
+  .liste {
+    grid-template-columns: 1fr;
+  }
+}

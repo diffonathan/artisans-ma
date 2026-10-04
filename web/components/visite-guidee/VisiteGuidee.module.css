@@ -1,0 +1,334 @@
+/* --accent-texte partout où l'accent porte du TEXTE : deux libellés de 12 px
+   écrits en --primary sur --accent-soft tombaient à 3,4:1, sous le seuil de
+   4,5:1. Le socle avait déjà payé cette leçon une fois ; elle est reperdue
+   à chaque nouveau fichier, d'où le rappel ici. */
+/* ══════════════════════════════════════════════════════════════════════════
+   LA VISITE GUIDÉE
+
+   Aucune couleur écrite en dur : tout vient des jetons de app/globals.css,
+   eux-mêmes tirés de CHARTE.md. Le `color-mix()` ci-dessous ne fait pas
+   exception — il DÉRIVE d'un jeton au lieu d'inventer une valeur, ce qui est
+   la seule façon d'obtenir un voile translucide sans écrire un rgba() dans un
+   composant.
+
+   Le verre, lui, n'est pas redéfini ici : la modale porte la classe globale
+   .verre. Recopier la recette lui donnerait une épaisseur de verre différente
+   des cartes d'artisan, et surtout l'ordre de chargement entre globals.css et
+   ce module n'est pas garanti — une surcharge du même fond gagnerait ou
+   perdrait selon l'ordre des imports de l'agent qui monte le composant.
+
+   Même raison pour les boutons du pied : ils viennent de la primitive
+   `components/Bouton.tsx` et ne sont pas redessinés ici. Deux recettes pour le
+   même rôle donnaient deux teintes, deux rayons et deux couleurs de texte
+   selon qu'on est dans la modale ou dans le reste du site.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.voile {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espace-4);
+  /* 86 % du fond nuit : assez opaque pour que le texte de la modale se lise
+     quel que soit l'écran derrière, assez transparent pour qu'on comprenne
+     qu'on est AU-DESSUS de la page et non sur une autre page. */
+  background-color: color-mix(in srgb, var(--fond) 86%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: apparition var(--duree-moyenne) var(--courbe);
+}
+
+.modale {
+  /* 44rem et non un pourcentage : au-delà, une ligne de texte dépasse les
+     ~75 caractères où l'œil perd le début de la ligne suivante. */
+  width: min(44rem, 100%);
+  max-height: 85dvh;
+  /* Trois rangées : l'en-tête et le pied restent visibles, seul le corps
+     défile. Un pied qui part en bas d'un long contenu laisse croire qu'il n'y
+     a pas de suite. */
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  animation: montee var(--duree-moyenne) var(--courbe);
+}
+
+/* ── En-tête ───────────────────────────────────────────────────────────── */
+
+.entete {
+  position: relative;
+  padding: var(--espace-5) var(--espace-6) var(--espace-4);
+  /* Une seule bordure, du côté du contenu : le liseré interne haut de .verre
+     fait déjà la limite supérieure. */
+  border-bottom: 1px solid var(--verre-bordure);
+  /* La croix de fermeture occupe le coin haut droit. */
+  padding-right: var(--espace-8);
+}
+
+.compteur {
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+  margin-bottom: var(--espace-2);
+}
+
+.titre {
+  font-size: var(--txt-lg);
+  color: var(--texte);
+}
+
+.fermer {
+  position: absolute;
+  top: var(--espace-4);
+  right: var(--espace-4);
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  font-size: var(--txt-lg);
+  line-height: 1;
+  color: var(--texte-doux);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rayon-pleine);
+  cursor: pointer;
+  transition:
+    color var(--duree-courte) var(--courbe),
+    background-color var(--duree-courte) var(--courbe),
+    border-color var(--duree-courte) var(--courbe);
+}
+
+.fermer:hover {
+  color: var(--texte);
+  background-color: var(--verre-fond-haut);
+  border-color: var(--verre-bordure);
+}
+
+/* ── Corps ─────────────────────────────────────────────────────────────── */
+
+.corps {
+  padding: var(--espace-5) var(--espace-6);
+  overflow-y: auto;
+  /* Arrivé en bas du texte, la molette ne doit pas se mettre à faire défiler
+     la page derrière — qui est figée, donc ne bougerait pas, mais le geste
+     reste capté et l'utilisateur croit que le défilement est cassé. */
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.paragraphe {
+  color: var(--texte-doux);
+  font-size: var(--txt-base);
+  line-height: var(--interligne-normal);
+}
+
+/* ── Comptes de démonstration ──────────────────────────────────────────── */
+
+.comptes {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+}
+
+.compte {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-2) var(--espace-3);
+  padding: var(--espace-3) var(--espace-4);
+  background-color: var(--verre-fond-haut);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-sm);
+}
+
+.compteRole {
+  flex: none;
+  padding: 0.1rem 0.6rem;
+  font-size: var(--txt-xs);
+  color: var(--accent-texte);
+  background-color: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-pleine);
+}
+
+.compteAdresse {
+  /* Explicite : sans cette ligne l'adresse hériterait de --police-texte, ce
+     qui est le bon choix — mais la rendre explicite dit au relecteur que
+     l'absence d'Azeret Mono ici est voulue et non oubliée. Une adresse
+     e-mail n'est pas un nombre. */
+  font-family: var(--police-texte);
+  font-size: var(--txt-sm);
+  color: var(--texte);
+  /* Une adresse ne se coupe pas aux espaces, faute d'en avoir : sans ceci
+     elle élargit la modale au-delà de l'écran d'un téléphone. */
+  overflow-wrap: anywhere;
+}
+
+.compteEtat {
+  margin-left: auto;
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+}
+
+/* ── Encadré « à retenir » ─────────────────────────────────────────────── */
+
+.aRetenir {
+  padding: var(--espace-4);
+  background-color: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-left-width: 2px;
+  border-left-color: var(--primary);
+  border-radius: var(--rayon-sm);
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.aRetenirTitre {
+  margin-bottom: var(--espace-1);
+  font-size: var(--txt-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+/* ── Pied ──────────────────────────────────────────────────────────────── */
+
+.pied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espace-4);
+  padding: var(--espace-4) var(--espace-6) var(--espace-5);
+  border-top: 1px solid var(--verre-bordure);
+}
+
+.points {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+}
+
+/* Le DESSIN fait 8 px, la CIBLE en fait 24. Une pastille de 8 px espacée de
+   8 px échoue à WCAG 2.2 SC 2.5.8 deux fois : ni par la taille (24 × 24 px
+   demandés), ni par l'exception d'espacement, puisque des cercles de 24 px
+   centrés sur deux pastilles distantes de 16 px se recoupent. Et c'est sur
+   téléphone que cela se paie, là où la requête de média plus bas centre ces
+   pastilles sous le pouce.
+
+   Le bouton n'est donc plus qu'une zone sensible transparente, et le fond, le
+   rayon et l'animation vivent sur ::before. L'allongement de l'étape courante
+   s'anime bien sur le DESSIN : porté par le bouton, il déplacerait les cibles
+   voisines à chaque changement d'étape. Rien ne change à l'œil. */
+.point,
+.pointActif {
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.point::before,
+.pointActif::before {
+  content: '';
+  display: block;
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: var(--verre-bordure);
+  border-radius: var(--rayon-pleine);
+  transition:
+    width var(--duree-moyenne) var(--courbe),
+    background-color var(--duree-moyenne) var(--courbe);
+}
+
+.point:hover::before {
+  background-color: var(--accent-border);
+}
+
+/* L'étape courante s'allonge au lieu de changer seulement de couleur : à
+   cette taille, une pastille se repère à sa forme avant sa teinte — et cela
+   reste vrai pour qui distingue mal le sarcelle du gris. 1,5rem remplit
+   exactement la cible, donc le dessin ne la déborde jamais. */
+.pointActif::before {
+  width: 1.5rem;
+  background-color: var(--primary);
+}
+
+.boutons {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+}
+
+/* Pas de `.primaire` ni de `.secondaire` ici : voir l'en-tête du fichier. Les
+   deux boutons du pied sont des <Bouton> de components/Bouton.tsx. */
+
+/* ── Mouvement ─────────────────────────────────────────────────────────── */
+
+/* Pas de @media (prefers-reduced-motion) ici : la dernière règle de
+   globals.css ramène déjà toute animation à 1 ms, et la dupliquer créerait
+   deux endroits à corriger. */
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes montee {
+  from {
+    opacity: 0;
+    /* Monte ET se rétracte à peine : un simple glissement vertical se lit
+       comme un panneau qui arrive, pas comme une fenêtre qui s'ouvre. */
+    transform: translateY(12px) scale(0.985);
+  }
+}
+
+/* ── Téléphone ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 40rem) {
+  .voile {
+    /* La modale se colle au bas de l'écran : c'est là que le pouce atteint
+       les boutons. */
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modale {
+    max-height: 92dvh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .entete {
+    padding: var(--espace-5) var(--espace-4) var(--espace-4);
+    padding-right: var(--espace-7);
+  }
+
+  .corps {
+    padding: var(--espace-4);
+  }
+
+  .pied {
+    /* Les boutons passent au-dessus des pastilles et prennent toute la
+       largeur : à deux côte à côte dans 320 px, « Précédent » se coupe. */
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding: var(--espace-4);
+  }
+
+  .points {
+    justify-content: center;
+  }
+
+  .boutons > * {
+    flex: 1;
+  }
+}

@@ -1,0 +1,30 @@
+/* La couleur et la police des chiffres viennent de la classe globale
+   `.montant` — rien n'est redéclaré ici, sinon deux endroits décideraient de
+   la teinte de l'argent. */
+
+.montant {
+  white-space: nowrap;
+}
+
+.normal {
+  font-size: inherit;
+}
+
+/* Le montant vedette d'un devis ou d'une réservation. Le poids monte avec le
+   corps : à ce corps-là, un 500 d'Azeret Mono paraît plus léger qu'en ligne. */
+.grand {
+  font-size: var(--txt-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* « DH » revient en DM Sans et perd l'alignement tabulaire, qui n'a de sens
+   que sur des chiffres. Légèrement reculé en corps et en opacité : l'unité se
+   répète à chaque ligne d'une liste, la valeur non. */
+.unite {
+  font-family: var(--police-texte);
+  font-variant-numeric: normal;
+  font-size: 0.82em;
+  font-weight: 500;
+  opacity: 0.85;
+}

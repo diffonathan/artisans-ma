@@ -1,0 +1,564 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   SOCLE VISUEL D'ARTISANS.MA
+
+   Ce fichier est le seul endroit du front où une couleur est écrite en dur.
+   Partout ailleurs : var(--…). Les valeurs viennent de CHARTE.md, qui les
+   tient lui-même des formules de la charte maison des 24 palettes — elles
+   sont CALCULÉES (assombrir/eclaircir à un taux donné), pas choisies à l'œil.
+   Les recalculer « à peu près » casserait la parenté entre les projets de la
+   série, qui est précisément ce que la charte achète.
+
+   Palette 03 — Sarcelle profond #0d9488.
+   Nuit seule : pas de prefers-color-scheme, pas de basculeur. Le fond du
+   body est donc posé explicitement, et non hérité du navigateur.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Polices ───────────────────────────────────────────────────────────
+     --police-dm-sans et --police-azeret-mono sont injectées par next/font
+     depuis app/layout.tsx. Les replis sont nommés pour que la page reste
+     lisible pendant le « swap », et non pour être jolis. */
+  --police-texte: var(--police-dm-sans), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --police-nombres: var(--police-azeret-mono), ui-monospace, "SFMono-Regular",
+    Consolas, monospace;
+
+  /* ── L'accent, et ce qui s'en dérive ──────────────────────────────────
+     Valeurs exactes du tableau de CHARTE.md. */
+  --primary: #0d9488;
+  --primary-dim: #0b7970;
+  --accent-soft: rgba(13, 148, 136, 0.1);
+  --accent-border: rgba(13, 148, 136, 0.3);
+  --accent-glow: rgba(13, 148, 136, 0.18);
+  --glass-border-hover: rgba(13, 148, 136, 0.35);
+  --grad-accent: linear-gradient(-15deg, #7ac4be, #0a736a);
+  /* L'accent quand il porte du TEXTE, et non un fond ou un trait.
+     --primary est une teinte moyenne : mesuré sur nos fonds, il plafonne à
+     4,9:1 sur une surface opaque et tombe à 3,2:1 dès qu'il se pose sur
+     --accent-soft au-dessus du verre de l'en-tête — sous le 4,5:1 exigé pour
+     du texte courant. Le même raisonnement que Bouton.module.css, mais à
+     l'envers : là le fond est clair et le texte doit être sombre, ici le fond
+     est nuit et c'est le texte qui doit s'éclaircir.
+     Valeur = l'extrémité claire de --grad-accent, donc aucune teinte neuve. */
+  --accent-texte: #7ac4be;
+
+  /* ── Les quatre rôles, jamais interchangés ────────────────────────────
+     action = --primary. Les trois autres ci-dessous. « Attention » n'a pas de
+     jeton : --or la porte, parce qu'un montant et un avertissement ne se
+     croisent pas dans le même composant de cette application. */
+  --or: #f9a825; /* valeur : tout dirham, la commission, le badge vérifié */
+  --vert: #4ade80; /* devis ACCEPTE, réservation TERMINEE, note haute */
+  --rouge: #f87171; /* devis REFUSE, réservation ANNULEE, erreur */
+
+  /* Déclinaisons des rôles pour les pastilles de statut : même teinte, fond
+     et bordure translucides, pour ne pas multiplier les couleurs. */
+  --or-soft: rgba(249, 168, 37, 0.12);
+  --or-border: rgba(249, 168, 37, 0.32);
+  --vert-soft: rgba(74, 222, 128, 0.12);
+  --vert-border: rgba(74, 222, 128, 0.32);
+  --rouge-soft: rgba(248, 113, 113, 0.12);
+  --rouge-border: rgba(248, 113, 113, 0.32);
+
+  /* ── La nuit ──────────────────────────────────────────────────────────
+     Les trois arrêts du dégradé nuit de la charte, exposés en jetons : un
+     composant qui a besoin d'un fond OPAQUE — un panneau déroulant dessiné
+     par le système, une modale — doit pouvoir s'y raccrocher au lieu
+     d'inventer un gris. */
+  --nuit-haut: #141417;
+  --nuit-median: #0b0b0d;
+  --fond: #060607;
+
+  /* ── Texte ────────────────────────────────────────────────────────────
+     Trois niveaux seulement. Un quatrième finit toujours par servir à
+     masquer un problème de hiérarchie plutôt qu'à le résoudre.
+
+     --texte-faible valait #71717a, et ce gris ne pouvait PAS convenir : sa
+     luminance relative le plafonne à 4,35:1 contre du noir pur, c'est-à-dire
+     contre un fond plus sombre que le plus sombre des nôtres. Or il porte du
+     vrai texte — l'aide d'un champ, « Pas encore d'avis », le compteur
+     d'étape, les placeholders —, tout cela à 12 ou 14 px, jamais assez gros
+     pour le seuil de 3:1. La valeur actuelle est eclaircir(#71717a, 0.25)
+     par les formules de CHARTE.md, soit 4,5:1 sur le pire de nos fonds. */
+  --texte: #f4f4f5;
+  --texte-doux: #a1a1aa;
+  --texte-faible: #95959b;
+
+  /* ── Verre ────────────────────────────────────────────────────────────
+     La recette complète du glassmorphism maison. --verre-lisere est le
+     liseré interne haut : c'est lui qui donne l'épaisseur, pas le flou.
+     Sans lui, une surface translucide ressemble à un calque d'opacité. */
+  --verre-fond: rgba(255, 255, 255, 0.04);
+  --verre-fond-haut: rgba(255, 255, 255, 0.06);
+  --verre-bordure: rgba(255, 255, 255, 0.1);
+  --verre-lisere: rgba(255, 255, 255, 0.08);
+  --verre-flou: blur(12px) saturate(140%);
+
+  /* ── Rayons ───────────────────────────────────────────────────────────── */
+  --rayon-xs: 6px;
+  --rayon-sm: 10px;
+  --rayon-md: 14px;
+  --rayon-lg: 20px;
+  --rayon-xl: 28px;
+  --rayon-pleine: 999px;
+
+  /* ── Ombres ───────────────────────────────────────────────────────────
+     Portées très étalées et peu opaques : sur un fond nuit, une ombre dure
+     se lit comme une bordure noire et non comme de la profondeur. */
+  --ombre-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --ombre-2: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --ombre-3: 0 24px 64px rgba(0, 0, 0, 0.55);
+  --ombre-accent: 0 8px 28px var(--accent-glow);
+
+  /* ── Mouvement ────────────────────────────────────────────────────────
+     --courbe est la courbe signature de la charte : départ franc, arrivée
+     longue. Elle ne se remplace pas par un « ease » au cas par cas, sinon la
+     série perd ce qui la rend reconnaissable en mouvement. */
+  --courbe: cubic-bezier(0.22, 1, 0.36, 1);
+  --duree-courte: 150ms;
+  --duree-moyenne: 280ms;
+  --duree-longue: 520ms;
+
+  /* ── Échelle typographique ────────────────────────────────────────────
+     Rapport ~1,25, et clamp() sur les trois plus grands corps seulement : en
+     dessous, une taille fluide devient illisible sur un téléphone sans rien
+     gagner sur un écran large. */
+  --txt-xs: 0.75rem;
+  --txt-sm: 0.875rem;
+  --txt-base: 1rem;
+  --txt-md: 1.125rem;
+  --txt-lg: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --txt-xl: clamp(1.5rem, 1.25rem + 1.2vw, 2rem);
+  --txt-2xl: clamp(2rem, 1.5rem + 2.4vw, 3.25rem);
+
+  --interligne-serre: 1.15;
+  --interligne-normal: 1.6;
+
+  /* ── Rythme ───────────────────────────────────────────────────────────── */
+  --espace-1: 0.25rem;
+  --espace-2: 0.5rem;
+  --espace-3: 0.75rem;
+  --espace-4: 1rem;
+  --espace-5: 1.5rem;
+  --espace-6: 2rem;
+  --espace-7: 3rem;
+  --espace-8: 4.5rem;
+  --largeur-page: 1180px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RÉINITIALISATION
+   ══════════════════════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  /* Pas de prefers-color-scheme ici : color-scheme DÉCLARE que la page est
+     sombre, ce qui fait dessiner les barres de défilement et les contrôles
+     natifs en conséquence. C'est une affirmation, pas une écoute du réglage
+     système — donc compatible avec « nuit uniquement ». */
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+  /* Le défilement doux sert aux ancres de la page — un devis pointé depuis la
+     liste, par exemple. Next 16 n'annule plus cette valeur pendant une
+     navigation : voir le commentaire de layout.tsx sur data-scroll-behavior. */
+  scroll-behavior: smooth;
+  /* Une barre collante masquerait la cible d'une ancre sans cette marge. */
+  scroll-padding-top: var(--espace-7);
+}
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Explicite, et non hérité : la page n'a pas de thème clair de secours. */
+  background-color: var(--fond);
+  color: var(--texte);
+  font-family: var(--police-texte);
+  font-size: var(--txt-base);
+  line-height: var(--interligne-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Le fond en profondeur. Dans un pseudo-élément FIXE plutôt que sur le body :
+   un background-attachment: fixed se comporte mal sur iOS, et les halos
+   doivent rester immobiles pendant le défilement pour que le verre posé
+   par-dessus ait quelque chose de stable à flouter. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      680px 680px at 10% 4%,
+      rgba(13, 148, 136, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      760px 760px at 92% 96%,
+      rgba(13, 148, 136, 0.06),
+      transparent 60%
+    ),
+    radial-gradient(
+      560px 560px at 68% 30%,
+      rgba(13, 148, 136, 0.05),
+      transparent 62%
+    ),
+    radial-gradient(
+      120% 85% at 50% 0%,
+      var(--nuit-haut) 0%,
+      var(--nuit-median) 55%,
+      var(--fond) 100%
+    );
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TYPOGRAPHIE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  line-height: var(--interligne-serre);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--txt-2xl);
+}
+h2 {
+  font-size: var(--txt-xl);
+}
+h3 {
+  font-size: var(--txt-lg);
+}
+h4 {
+  font-size: var(--txt-md);
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  /* --accent-texte et non --primary : un lien est du CORPS de texte, donc au
+     seuil de 4,5:1. --primary plafonne à 4,9:1 sur une surface opaque et
+     tombe à 3,2:1 dès qu'il se pose sur du verre — c'est-à-dire sur la
+     majorité des surfaces de ce projet. Le piège est décrit dans CHARTE.md ;
+     il a été reperdu ici parce que cette règle vise « a », sans que rien ne
+     rappelle au passage qu'elle porte du texte. */
+  color: var(--accent-texte);
+  text-decoration: none;
+  transition: color var(--duree-courte) var(--courbe);
+}
+
+/* Le survol ÉCLAIRCIT, il n'assombrit pas : sur socle nuit, --primary-dim
+   ferait perdre jusqu'à 2,7 points de ratio au moment exact où l'on pointe le
+   lien, et le ferait passer sous 4,5:1 sur toutes nos surfaces. Le
+   soulignement vient en plus, pour que l'indice ne repose pas sur la seule
+   couleur. --primary-dim reste juste là où il est un FOND. */
+a:hover {
+  color: var(--accent-texte);
+  text-decoration: underline;
+}
+
+strong {
+  font-weight: 600;
+  color: var(--texte);
+}
+
+small {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES NOMBRES
+
+   Azeret Mono ne sert QU'ICI : montants en dirhams, distances, notes,
+   compteurs. Jamais pour de la prose — c'est une interdiction de la charte.
+   tabular-nums est le vrai bénéfice : dans une colonne de devis, des chiffres
+   de largeurs différentes font danser l'alignement des virgules.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.nombre {
+  font-family: var(--police-nombres);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Un montant est une valeur : rôle --or. La classe porte la couleur en plus
+   de la police pour qu'aucun composant n'ait à la rappeler. */
+.montant {
+  font-family: var(--police-nombres);
+  font-variant-numeric: tabular-nums;
+  color: var(--or);
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TEXTE RÉSERVÉ AUX LECTEURS D'ÉCRAN
+
+   Globale pour la même raison que .verre et la recette des champs : quatre
+   modules en portaient la copie exacte, et une copie qui dérive en silence
+   est une régression d'accessibilité que personne ne voit à l'écran.
+
+   clip-path et non `display: none` ni `visibility: hidden`, qui retireraient
+   le texte de l'arbre d'accessibilité en même temps que de l'écran. Le
+   `white-space: nowrap` empêche un libellé de se replier en colonne d'une
+   lettre dans son pixel, ce que certains moteurs lisent de travers.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.lecture-seule {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE VERRE
+
+   Classe globale parce que la recette est une identité et non une décoration :
+   une carte d'artisan, un panneau de devis et une modale doivent avoir
+   exactement la même épaisseur de verre.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.verre {
+  position: relative;
+  background-color: var(--verre-fond);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-lg);
+  backdrop-filter: var(--verre-flou);
+  -webkit-backdrop-filter: var(--verre-flou);
+  /* Le liseré interne haut d'abord, l'ombre portée ensuite. */
+  box-shadow:
+    inset 0 1px 0 var(--verre-lisere),
+    var(--ombre-2);
+}
+
+/* Réservé aux surfaces CLIQUABLES : une carte purement informative qui réagit
+   au survol promet une action qui n'existe pas. */
+.verre-interactif {
+  transition:
+    border-color var(--duree-moyenne) var(--courbe),
+    transform var(--duree-moyenne) var(--courbe),
+    box-shadow var(--duree-moyenne) var(--courbe);
+}
+
+.verre-interactif:hover {
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 var(--verre-lisere),
+    var(--ombre-3),
+    var(--ombre-accent);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FOCUS
+
+   Visible partout, et déclaré une seule fois. :focus-visible et non :focus —
+   le second entoure aussi les éléments cliqués à la souris, ce qui pousse les
+   auteurs à l'enlever, et avec lui l'accessibilité au clavier.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--rayon-xs);
+}
+
+/* Les champs portent déjà un halo de focus (plus bas) : un contour en plus
+   doublerait le trait. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
+
+::selection {
+  background-color: var(--accent-border);
+  color: var(--texte);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CHAMPS DE FORMULAIRE — recette globale
+
+   Globale et non par composant : le formulaire de besoin, celui de devis et
+   celui d'inscription doivent se ressembler sans que personne ne recopie
+   douze déclarations.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+  color: inherit;
+}
+
+input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]),
+textarea,
+select:not([multiple]) {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  background-color: var(--verre-fond-haut);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-sm);
+  color: var(--texte);
+  transition:
+    border-color var(--duree-courte) var(--courbe),
+    box-shadow var(--duree-courte) var(--courbe);
+}
+
+textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+  line-height: var(--interligne-normal);
+}
+
+/* Un champ qui attend un nombre reçoit la police des nombres : montant d'un
+   devis, rayon d'intervention, budget. C'est le seul cas où Azeret Mono
+   arrive sans que le composant la demande. */
+input[type="number"],
+input[inputmode="numeric"],
+input[inputmode="decimal"] {
+  font-family: var(--police-nombres);
+  font-variant-numeric: tabular-nums;
+}
+
+::placeholder {
+  color: var(--texte-faible);
+  opacity: 1; /* Firefox applique sinon une opacité de 0,54 par-dessus. */
+}
+
+input:hover:not(:disabled),
+textarea:hover:not(:disabled),
+select:not([multiple]):hover:not(:disabled) {
+  border-color: var(--accent-border);
+}
+
+input:focus,
+textarea:focus,
+select:not([multiple]):focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Un champ refusé par le serveur reçoit aria-invalid : la couleur suit
+   l'attribut d'accessibilité plutôt qu'une classe, pour qu'on ne puisse pas
+   avoir l'un sans l'autre. */
+input[aria-invalid="true"],
+textarea[aria-invalid="true"],
+select[aria-invalid="true"] {
+  border-color: var(--rouge);
+}
+
+input[aria-invalid="true"]:focus,
+textarea[aria-invalid="true"]:focus,
+select[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px var(--rouge-soft);
+}
+
+/* Le remplissage automatique de Chrome impose un fond blanc en !important sur
+   le champ ; seule l'ombre interne passe au travers. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--texte);
+  -webkit-box-shadow: inset 0 0 0 100px var(--nuit-haut);
+  caret-color: var(--texte);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--primary);
+  width: 1.05rem;
+  height: 1.05rem;
+  cursor: pointer;
+}
+
+/* ── Le select ────────────────────────────────────────────────────────────
+   Le chevron est une IMAGE DE FOND. Écrire « background: » en raccourci — y
+   compris dans un style inline d'un composant qui veut seulement changer la
+   teinte — réinitialise background-image et le fait disparaître sans aucune
+   erreur. Utiliser background-color. Erreur déjà commise sur un autre projet
+   maison : c'est pourquoi la recette est ici, et nulle part ailleurs. */
+select:not([multiple]) {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23a1a1aa' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  background-size: 12px 8px;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+/* Le panneau déroulant est dessiné par le système : sans ces deux lignes il
+   reste blanc sur Windows. Les valeurs doublent --nuit-haut et --texte parce
+   que ce panneau ne résout pas var() sur toutes les plateformes. */
+select option {
+  background-color: #141417;
+  color: #f4f4f5;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOUVEMENT RÉDUIT
+
+   Dernière règle du fichier, donc gagnante sans surenchère de spécificité.
+   Les durées passent à 1 ms et non à 0 : une interface qui attend
+   transitionend ne verrait jamais l'événement à durée nulle.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .verre-interactif:hover {
+    transform: none;
+  }
+}

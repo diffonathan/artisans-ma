@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"
+     role="img" aria-labelledby="artisans-logo-titre artisans-logo-desc">
+  <title id="artisans-logo-titre">Artisans.ma</title>
+  <desc id="artisans-logo-desc">Une marque de tâcheron : la plaque d'un poinçon, cerclée d'or, frappée d'une coche blanche. Le signe qu'un artisan appose sur l'ouvrage fini, et qui déclenche son paiement.</desc>
+
+  <defs>
+    <!-- Identifiant préfixé par la marque, et non « a-metal » : deux SVG inlinés
+         dans la même page partagent un seul espace de noms d'identifiants, et le
+         second dégradé déclaré gagnerait silencieusement pour les deux. -->
+    <linearGradient id="artisans-poincon-champ" gradientUnits="userSpaceOnUse"
+                    x1="36.9" y1="50.4" x2="27.1" y2="13.6">
+      <stop offset="0" stop-color="#7ac4be"/>
+      <stop offset="1" stop-color="#0a736a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- LA PLAQUE D'OR, posée comme un APLAT et non comme un contour.
+       Un `stroke` est centré sur son tracé : la moitié de son épaisseur tombe
+       DEHORS, sur le fond, où elle s'évanouit au lissage — le cerne annoncé à
+       4,5 unités n'en pèse alors que 2,25 contre le fond. Deux aplats
+       concentriques donnent au contraire une frontière extérieure franche et
+       une épaisseur d'or exacte, mesurée à 4,6 unités au plus serré.
+       Forme en coussin : carré aux côtés gonflés de 2 unités. Le sceau
+       administratif est rond et cranté, le badge des réseaux sociaux rond et
+       lisse ; le coussin est la silhouette de l'estampille réellement frappée
+       au marteau, et il garde des angles, donc un haut et un bas, donc un objet. -->
+  <path d="M20 7 Q32 5 44 7 Q57 7 57 20 Q59 32 57 44 Q57 57 44 57 Q32 59 20 57 Q7 57 7 44 Q5 32 7 20 Q7 7 20 7 Z" fill="#f9a825"/>
+
+  <!-- LE CHAMP FRAPPÉ, en sarcelle : la même forme réduite de 0,82 autour du
+       centre, ce qui garantit la même épaisseur d'or sur tout le pourtour
+       plutôt qu'« à peu près ».
+       0,82 et non 0,76 : à 0,76 le comptage de pixels d'un rendu à 16 px donne
+       88 pixels d'or pour 70 de sarcelle — le cerne devient un cadre, et c'est
+       l'or, que la charte réserve à la valeur, qui domine la marque. À 0,82 le
+       même comptage donne 64 d'or, 74 de sarcelle, 29 de blanc : un cerne.
+       Le dégradé suit la direction du jeton grad-accent (-15deg : clair en bas,
+       sombre en haut) au lieu de l'inverser pour simuler une lumière d'en haut.
+       Deux raisons, et la seconde est la vraie : la charte est la source unique,
+       un logo qui contredit son dégradé se voit dès qu'il côtoie une surface qui
+       le porte ; et un champ de poinçon est CREUX — enfoncé par le coup — donc
+       sous une lumière du haut il s'ombre en haut et s'éclaire en bas. La
+       direction de la charte est aussi la direction physiquement juste. -->
+  <path d="M22.16 11.5 Q32 9.86 41.84 11.5 Q52.5 11.5 52.5 22.16 Q54.14 32 52.5 41.84 Q52.5 52.5 41.84 52.5 Q32 54.14 22.16 52.5 Q11.5 52.5 11.5 41.84 Q9.86 32 11.5 22.16 Q11.5 11.5 22.16 11.5 Z" fill="url(#artisans-poincon-champ)"/>
+
+  <!-- LA COCHE, blanche parce que c'est la forme qui doit survivre en dernier :
+       à 16 px le dégradé s'aplatit et le bombé du coussin disparaît, il ne reste
+       qu'un trait blanc dans un cadre — et c'est le bon message, « attesté ».
+       Épaisseur 11, soit 2,75 px à 16 px. Elle est fixée par un comptage et non
+       par le goût : sous 10, le blanc tombe à 25 pixels sur 256 et la coche se
+       lit comme une tache diagonale ; à 11 elle en occupe 29 et le coude reste
+       visible.
+       Les extrémités sont tenues à 5,17 unités du cerne d'or au plus serré,
+       valeur mesurée : en dessous, le lissage soude le blanc à l'or et la coche
+       se referme. C'est cette contrainte — pas la composition — qui plafonne la
+       taille du glyphe. -->
+  <path d="M21.5 32.5 L29.9 40.9 L42.1 24.7" fill="none" stroke="#ffffff"
+        stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

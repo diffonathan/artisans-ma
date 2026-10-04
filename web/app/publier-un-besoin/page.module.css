@@ -1,0 +1,200 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   PUBLIER UN CHANTIER — la page et son formulaire
+
+   Aucune couleur en dur : tout est var(--…), défini dans app/globals.css
+   d'après CHARTE.md. Le texte d'accent prend --accent-texte et jamais
+   --primary, qui tombe à 3,2:1 sur le verre.
+
+   Rien ici ne restyle un `<select>` : son chevron est une image de fond
+   posée par globals.css, et le moindre `background:` en raccourci
+   l'escamoterait.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+  /* Pas de `padding-block` : le <main> de l'enveloppe en pose déjà un, et
+     l'ajouter ici donnait à ces pages une respiration de haut différente des
+     autres sans qu'on voie d'où elle venait. */
+}
+
+/* ── L'en-tête ───────────────────────────────────────────────────────────── */
+
+.enTete {
+  max-width: 62ch;
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+  margin-bottom: var(--espace-2);
+}
+
+.titre {
+  margin-bottom: var(--espace-3);
+}
+
+.phrase {
+  color: var(--texte-doux);
+}
+
+/* ── Le corps : le formulaire, et l'aparté sur la confidentialité ────────── */
+
+/* Deux colonnes dès qu'il y a la place, le formulaire deux fois plus large :
+   l'aparté se lit une fois, le formulaire s'utilise. Il est posé à droite et
+   non en dessous pour être lu PENDANT la saisie de l'adresse, qui est le
+   moment où la question se pose. */
+.corps {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--espace-5);
+}
+
+.carteFormulaire {
+  /* La carte reçoit `display: block` de Carte.module.css ; le formulaire
+     qu'elle contient porte la colonne, donc rien à vaincre ici. */
+  min-width: 0;
+}
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+/* ── Le compteur de la description ───────────────────────────────────────── */
+
+/* Posé en bloc sous la phrase d'aide : en ligne, il se collerait à la fin du
+   texte et on le lirait comme une suite de la phrase. */
+.compteurInsuffisant,
+.compteurAtteint {
+  display: block;
+  margin-top: var(--espace-2);
+  font-size: var(--txt-sm);
+}
+
+/* Le seuil non atteint n'est pas une erreur : c'est un état transitoire,
+   pendant que l'on écrit. L'or — rôle « attention » de la charte, qui ne
+   croise jamais un montant dans ce composant — le dit sans accuser. */
+.compteurInsuffisant {
+  color: var(--or);
+}
+
+.compteurAtteint {
+  color: var(--vert);
+}
+
+/* ── Le bloc de position ─────────────────────────────────────────────────── */
+
+/* `fieldset` apporte une bordure et un remplissage par défaut du navigateur,
+   qui ne ressemblent à rien d'autre sur cette page. */
+.bloc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  padding: var(--espace-4);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-md);
+  background-color: var(--verre-fond);
+  margin: 0;
+  min-width: 0;
+}
+
+.blocTitre {
+  padding: 0 var(--espace-2);
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.blocPhrase {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.lignePosition {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-3);
+}
+
+.positionLue {
+  flex: 1 1 18ch;
+  font-size: var(--txt-sm);
+  color: var(--texte);
+}
+
+.positionEchec {
+  flex: 1 1 100%;
+  font-size: var(--txt-sm);
+  color: var(--rouge);
+}
+
+/* ── L'envoi ─────────────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.actionsPhrase {
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+/* ── L'aparté sur ce que les artisans voient ─────────────────────────────── */
+
+aside.aparte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  min-width: 0;
+}
+
+.aparteTitre {
+  font-size: var(--txt-base);
+  font-weight: 600;
+}
+
+.aparteListe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  /* La puce est remplacée par un retrait et un trait d'accent : trois
+     éléments dont le dernier porte la vraie information se lisent mieux en
+     blocs séparés qu'en liste serrée. */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.aparteListe li {
+  padding-left: var(--espace-4);
+  border-left: 2px solid var(--accent-border);
+}
+
+.aparteFin {
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+/* ── Tablette et téléphone ───────────────────────────────────────────────── */
+
+@media (max-width: 60rem) {
+  .corps {
+    /* L'aparté passe sous le formulaire : à cette largeur, deux colonnes
+       donnent une colonne de treize caractères. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

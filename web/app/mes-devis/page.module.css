@@ -1,0 +1,190 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /mes-devis
+
+   Importé aussi par `RetirerDevis.tsx` : le bouton de retrait vit dans la
+   carte du devis.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  /* Ni largeur, ni marge, ni padding : le <main> de l'enveloppe
+     (`.contenu` dans Enveloppe.module.css) pose déjà exactement cette
+     largeur de page et ce rembourrage. Les redéclarer ici doublait la
+     gouttière latérale et resserrait le contenu de ces quatre pages par
+     rapport à toutes les autres. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+}
+
+.ouverture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  max-width: 68ch;
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.titre {
+  font-size: var(--txt-xl);
+  line-height: var(--interligne-serre);
+  font-weight: 600;
+}
+
+.chapeau {
+  font-size: var(--txt-md);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+}
+
+/* ── Les groupes de statut ──────────────────────────────────────────────── */
+
+.groupes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+}
+
+.groupe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.titreGroupe {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-3);
+  font-size: var(--txt-lg);
+  font-weight: 600;
+}
+
+/* Le compteur est un nombre : Azeret Mono par la classe globale `.nombre`,
+   et la pastille ne fait que lui donner une assise. */
+.compteGroupe {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.9rem;
+  padding: 0 var(--espace-2);
+  height: 1.6rem;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-pleine);
+  background-color: var(--accent-soft);
+  color: var(--accent-texte);
+  font-size: var(--txt-sm);
+}
+
+.phraseGroupe {
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-faible);
+  max-width: 72ch;
+}
+
+/* ── Les cartes ─────────────────────────────────────────────────────────── */
+
+.liste {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--espace-4);
+  align-items: start;
+}
+
+.devis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.enTeteDevis {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espace-3);
+}
+
+.titreDevis {
+  font-size: var(--txt-md);
+  line-height: var(--interligne-serre);
+  font-weight: 600;
+}
+
+/* Trois valeurs sur une ligne, qui se replient quand la carte est étroite.
+   `dl` et non des `div` : montant, délai et date sont des paires
+   libellé/valeur, et un lecteur d'écran les annonce alors comme telles. */
+.chiffres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-4);
+}
+
+.chiffre {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+}
+
+.chiffre dt {
+  font-size: var(--txt-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+}
+
+.chiffre dd {
+  font-size: var(--txt-sm);
+  color: var(--texte);
+}
+
+/* Une date est de la prose : pas de police à chasse fixe dessus. */
+.jour {
+  color: var(--texte-doux);
+}
+
+.retrait {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-2);
+}
+
+/* ── Vide, erreur, chargement ───────────────────────────────────────────── */
+
+.etatVide,
+.etatEchec {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-3);
+  max-width: 62ch;
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+}
+
+.titreEtat {
+  font-size: var(--txt-md);
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.phraseEchec {
+  color: var(--rouge);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: var(--espace-5) var(--espace-4) var(--espace-7);
+  }
+
+  .liste {
+    grid-template-columns: 1fr;
+  }
+}

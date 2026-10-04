@@ -1,0 +1,39 @@
+/* Aucune couleur ici : fond, bordure, flou et liseré viennent entièrement de
+   la classe globale `.verre`. Ce module ne règle que le rythme interne. */
+
+.carte {
+  /* `.verre` est déjà en position: relative. Rien à reposer. */
+  display: block;
+  min-width: 0; /* Sinon une carte en grille refuse de rétrécir sous son contenu. */
+}
+
+.aucun {
+  padding: 0;
+  /* Le contenu touche les bords : sans cela, une image carrée dépasserait du
+     rayon du verre et en montrerait les coins. */
+  overflow: hidden;
+}
+
+.sm {
+  padding: var(--espace-3);
+}
+
+.md {
+  padding: var(--espace-5);
+}
+
+.lg {
+  padding: var(--espace-6);
+}
+
+/* La carte-lien annule l'apparence d'ancre héritée de globals.css : la teinte
+   d'accent sur tout le texte d'une carte le rendrait illisible. La couleur
+   d'accent reste disponible à l'intérieur, là où l'agent la met. */
+.lien {
+  color: inherit;
+  text-decoration: none;
+}
+
+.lien:hover {
+  color: inherit;
+}

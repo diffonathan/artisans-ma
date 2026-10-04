@@ -1,0 +1,378 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /mes-reservations
+
+   Un seul module pour la page, ses deux composants d'interaction et ses états
+   (chargement, vide, échec) : ils ne partagent rien avec le reste de
+   l'application et tout entre eux — les mêmes mentions, les mêmes refus, la
+   même colonne de lecture.
+
+   Aucune couleur en dur : tout est `var(--…)`, défini dans `app/globals.css`
+   d'après `CHARTE.md`. Les textes d'accent prennent `--accent-texte` et non
+   `--primary` : cette teinte-là est moyenne, et du texte écrit avec elle
+   tombe sous le seuil de contraste dès qu'il se pose sur le verre.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Aucun `padding` ici : le `<main>` de l'enveloppe en pose déjà
+   (`Enveloppe.module.css`, `.contenu`). L'ajouter une seconde fois
+   doublerait la respiration du haut de page sans qu'on voie d'où elle vient. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+}
+
+/* ── L'ouverture ────────────────────────────────────────────────────────── */
+
+.ouverture {
+  /* Une colonne étroite : le chapeau explique ce que « figé » veut dire, et
+     une ligne de cent caractères se relit deux fois. */
+  max-width: 64ch;
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+  margin-bottom: var(--espace-3);
+}
+
+.titre {
+  margin-bottom: var(--espace-4);
+}
+
+.chapeau {
+  color: var(--texte-doux);
+  line-height: var(--interligne-normal);
+}
+
+/* ── La liste ───────────────────────────────────────────────────────────── */
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+  list-style: none;
+}
+
+/* `li.reservation` et non `.reservation` : la carte reçoit déjà `.carte` de
+   Carte.module.css, qui pose `display: block`. Deux sélecteurs d'une seule
+   classe se départagent par l'ordre des feuilles, lequel dépend de l'ordre
+   des imports — une dépendance invisible. Un sélecteur « élément + classe »
+   l'emporte par spécificité, donc indépendamment de l'ordre. */
+li.reservation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.enTete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espace-3);
+}
+
+.identite {
+  /* Sans cela, un titre long refuse de se replier et pousse l'étiquette de
+     statut hors de la carte. */
+  min-width: 0;
+  flex: 1 1 18rem;
+}
+
+.titreReservation {
+  font-size: var(--txt-md);
+  font-weight: 600;
+  line-height: var(--interligne-serre);
+  margin-bottom: var(--espace-2);
+}
+
+.prestataire {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.lienArtisan {
+  color: var(--accent-texte);
+  text-decoration-color: var(--accent-border);
+  text-underline-offset: 0.2em;
+}
+
+.lienArtisan:hover {
+  text-decoration-color: var(--accent-texte);
+}
+
+/* ── La fiche : intitulé, valeur, précision ─────────────────────────────── */
+
+.fiche {
+  display: grid;
+  /* Deux colonnes dès qu'il y a la place, une seule sur un téléphone. Les
+     quatre lignes ne s'alignent pas sur une grille à colonnes fixes : la
+     valeur « adresse » est bien plus longue que « commission ». */
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--espace-4) var(--espace-5);
+}
+
+.ligne {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  min-width: 0;
+}
+
+.intitule {
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+}
+
+/* `display: block` et non une colonne flex, et c'est un piège rencontré ici :
+   la valeur d'un créneau est une PHRASE faite de texte et de nombres
+   (« jeudi 8 octobre 2026, de 10:00 à 14:00 »). En colonne flex, chaque nœud
+   de texte et chaque `<span class="nombre">` devient un élément flex, donc une
+   ligne à lui seul — la phrase se brise en escalier. */
+.valeur {
+  color: var(--texte);
+  line-height: var(--interligne-normal);
+  /* Une adresse écrite d'un trait ne doit pas déborder de la carte. */
+  overflow-wrap: break-word;
+}
+
+/* La précision est portée par un `<span>` — légal dans un `<dd>`, là où un
+   `<p>` à l'intérieur d'un autre flux de phrase ne l'est pas toujours. D'où
+   `display: block` pour qu'elle passe à la ligne. */
+.precision {
+  display: block;
+  margin-top: var(--espace-1);
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+  line-height: var(--interligne-normal);
+}
+
+/* ── Les actions ────────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-5);
+  padding-top: var(--espace-4);
+  border-top: 1px solid var(--verre-bordure);
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-3);
+  /* Chaque action garde sa largeur de lecture : la mention de paiement fait
+     trois lignes, et elle ne doit pas s'étendre sur toute la carte. */
+  flex: 1 1 22rem;
+  min-width: 0;
+}
+
+.confirmation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-3);
+}
+
+/* Les mentions disent ce que le bouton fait réellement. Elles sont en texte
+   faible mais pas effacées : une mention illisible ne vaut pas mieux qu'une
+   mention absente. */
+.mention {
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+  line-height: var(--interligne-normal);
+  max-width: 46ch;
+}
+
+/* Le refus de l'API. Même recette que l'erreur de champ du socle : le losange
+   est une redondance volontaire, la couleur seule ne distingue pas une
+   erreur d'une aide pour un lecteur daltonien. */
+.refus {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-1);
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  color: var(--rouge);
+  line-height: var(--interligne-normal);
+}
+
+.refus::before {
+  content: '\25c6';
+  flex: none;
+  font-size: 0.8em;
+  line-height: 1.7;
+}
+
+/* ── Le dépôt d'avis ────────────────────────────────────────────────────── */
+
+.avis {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-4);
+  padding: var(--espace-5);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-md);
+  background-color: var(--accent-soft);
+}
+
+.titreAvis {
+  font-size: var(--txt-base);
+  font-weight: 600;
+  color: var(--accent-texte);
+}
+
+/* Aucun `display: flex` sur ce `<fieldset>`, et ce n'est pas une préférence :
+   plusieurs moteurs sortent la `<legend>` du flux dès que le fieldset devient
+   un conteneur flex, et le groupe se retrouve sans intitulé visible. Un bloc
+   ordinaire avec deux marges donne le même résultat sans ce risque. */
+.notes {
+  border: 0;
+  padding: 0;
+}
+
+.notes .refus {
+  margin-top: var(--espace-2);
+}
+
+.legende {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  color: var(--texte-doux);
+  /* Un fieldset pose une légende dans sa bordure ; la bordure est retirée, la
+     marge est donc explicite. */
+  margin-bottom: var(--espace-2);
+}
+
+/* `--primary` et non `--accent-texte`, par exception assumée : c'est la copie
+   exacte de `.marqueur` dans `components/Champ.module.css`, et cet astérisque
+   est posé juste au-dessus de ceux des champs du socle. Un jeton différent les
+   ferait diverger dans le même formulaire. Le glyphe est par ailleurs
+   `aria-hidden` et doublé d'un mot pour les lecteurs d'écran : il ne porte
+   aucune information que la couleur seule transmettrait. */
+.obligatoire {
+  margin-left: 0.2em;
+  color: var(--primary);
+}
+
+.etoiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+}
+
+/* Le bouton radio lui-même est masqué à l'œil mais PAS retiré du document :
+   `display: none` le sortirait du parcours de tabulation et de l'arbre
+   d'accessibilité, et le groupe cesserait d'être utilisable au clavier. */
+.etoile input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* `inline-flex` explicite : l'étiquette est un `<label>`, donc `inline` par
+   défaut, et la pastille qu'elle contient est un bloc. Un bloc dans un flux
+   en ligne produit des boîtes anonymes et une hauteur de ligne imprévisible. */
+.etoile {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.etoileValeur {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-sm);
+  background-color: var(--verre-fond);
+  color: var(--texte-doux);
+  font-size: var(--txt-md);
+  transition:
+    border-color var(--duree-courte) var(--courbe),
+    background-color var(--duree-courte) var(--courbe),
+    color var(--duree-courte) var(--courbe);
+}
+
+.etoile:hover .etoileValeur {
+  border-color: var(--glass-border-hover);
+  color: var(--texte);
+}
+
+/* La note choisie prend le rôle « accepté » : c'est une valeur retenue, et le
+   vert la distingue d'un survol. */
+/* La pastille cochée prend le rôle ACTION, pas le vert.
+   Le vert signifie « hausse, gain, accepté » dans toute l'application ; une
+   note de 1 sur 5 affichée en vert dirait le contraire de ce qu'elle vaut.
+   Ce qu'il faut signaler ici n'est pas une qualité, c'est une SÉLECTION —
+   et la sélection, c'est l'accent. */
+.etoile input:checked + .etoileValeur {
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+  color: var(--accent-texte);
+}
+
+/* Le contour de focus ne peut pas venir du contrôle, qui est hors de l'écran :
+   il est reporté sur la pastille, sinon la navigation au clavier se fait à
+   l'aveugle. */
+.etoile input:focus-visible + .etoileValeur {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Le champ long du socle reçoit cette classe sur son enveloppe. La colonne
+   est en `align-items: flex-start` — sans quoi les boutons s'étireraient sur
+   toute la largeur — et le champ, lui, doit bien prendre toute la largeur. Un
+   `:global(.champ)` ne marcherait pas : la classe de Champ.module.css est
+   hachée, et le sélecteur global ne la retrouverait pas. */
+.champAvis {
+  align-self: stretch;
+}
+
+/* ── L'avis déjà déposé ─────────────────────────────────────────────────── */
+
+.avisDepose {
+  padding: var(--espace-4);
+  border: 1px solid var(--vert-border);
+  border-radius: var(--rayon-md);
+  background-color: var(--vert-soft);
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+  line-height: var(--interligne-normal);
+}
+
+/* ── Les états : vide, échec, chargement ────────────────────────────────── */
+
+.vide,
+.echec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  max-width: 62ch;
+}
+
+.titreVide {
+  font-size: var(--txt-md);
+  font-weight: 600;
+}
+
+.texteVide {
+  color: var(--texte-doux);
+  line-height: var(--interligne-normal);
+}
+
+.cheminsVide {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-3);
+  margin-top: var(--espace-2);
+}

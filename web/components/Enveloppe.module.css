@@ -1,0 +1,341 @@
+/* Toutes les teintes sont des jetons. La barre ne réutilise PAS la classe
+   globale `.verre` : celle-ci est cernée sur ses quatre côtés et arrondie,
+   ce qui est juste pour une carte posée dans la page et faux pour une barre
+   collée en haut de l'écran — on verrait son bord supérieur et ses deux côtés
+   flotter. Elle reprend donc la même matière (fond, flou, liseré) avec une
+   seule bordure, en bas. */
+
+.entete {
+  position: sticky;
+  top: 0;
+  /* Au-dessus du contenu, sous une éventuelle modale ou la visite guidée, qui
+     appartiennent à d'autres agents et monteront plus haut. */
+  z-index: 50;
+  background-color: var(--verre-fond-haut);
+  border-bottom: 1px solid var(--verre-bordure);
+  backdrop-filter: var(--verre-flou);
+  -webkit-backdrop-filter: var(--verre-flou);
+  box-shadow: inset 0 1px 0 var(--verre-lisere);
+}
+
+.barre {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-5);
+  width: 100%;
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  padding: var(--espace-3) var(--espace-4);
+}
+
+/* ── La marque ──────────────────────────────────────────────────────────── */
+
+.marque {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-2);
+  /* Le lien du logo n'est pas un lien de texte : il ne prend pas la teinte
+     d'accent de globals.css, sinon le mot « Artisans » changerait de couleur
+     au survol de tout l'en-tête. */
+  color: var(--texte);
+  flex: none;
+}
+
+.marque:hover {
+  color: var(--texte);
+}
+
+.poincon {
+  /* Le poinçon est une pièce de métal : il garde sa taille, il ne s'étire pas
+     quand la barre se resserre. */
+  flex: none;
+}
+
+.nom {
+  font-weight: 600;
+  font-size: var(--txt-md);
+  letter-spacing: -0.02em;
+  /* « Artisans.ma » ne se coupe jamais en deux lignes. */
+  white-space: nowrap;
+}
+
+/* « .ma » porte le rôle « action », comme dans logo-complet.svg. C'est la
+   seule partie du nom qui change de couleur, et c'est voulu : l'extension est
+   ce qui dit le pays. */
+.extension {
+  color: var(--primary);
+}
+
+/* ── La navigation ────────────────────────────────────────────────────────
+   Pas de bouton d'ouverture, pas de panneau, donc aucun état : sur un écran
+   étroit, la rangée de rubriques DÉFILE horizontalement. Un menu replié
+   demanderait un état, une fermeture au clic extérieur, un piégeage du focus
+   et une touche Échap — quatre comportements à tenir pour trois liens. */
+
+.navigation {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  /* Le défilement horizontal ne doit pas découper le contour de focus des
+     liens : la marge interne lui laisse la place. */
+  padding: 2px 0;
+  scrollbar-width: none;
+}
+
+.navigation::-webkit-scrollbar {
+  display: none;
+}
+
+.rubriques {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-1);
+  list-style: none;
+}
+
+/* ══ Sous 420 px, la barre PASSE À LA LIGNE au lieu de défiler ═════════════
+
+   Elle défilait, et de 14 pixels seulement : sur un téléphone de 375 px, la
+   dernière rubrique était coupée au bord de l'écran. Quatorze pixels, cela ne
+   se lit pas comme un conteneur qui défile — cela se lit comme un défaut
+   d'affichage, et personne ne pense à faire glisser une barre de navigation
+   pour vérifier s'il manque quelque chose.
+
+   Rogner la marge interne aurait suffi à faire tenir CES libellés-là. C'est
+   précisément ce qu'il ne faut pas faire : « Chantiers à chiffrer » est déjà
+   la plus longue étiquette du projet, mais la prochaine rouvrira le problème,
+   et personne ne saura pourquoi la marge valait 0,55 rem.
+
+   Le retour à la ligne, lui, tient quelle que soit la longueur des libellés.
+   Il coûte une barre sur deux lignes quand il y a trop de rubriques — ce qui
+   est visible, honnête, et sans découpe. */
+@media (max-width: 420px) {
+  .navigation {
+    /* Plus de défilement : sans lui, un conteneur qui enveloppe ses enfants
+       n'a plus de raison de rogner. */
+    overflow-x: visible;
+  }
+
+  .rubriques {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 2px;
+  }
+
+  .rubrique {
+    /* L'espacement horizontal se resserre un peu, la zone tactile verticale
+       ne bouge pas : 0,45 rem de part et d'autre gardent la cible au-dessus
+       des 44 px recommandés une fois la hauteur de ligne comptée. */
+    padding-inline: 0.55rem;
+  }
+}
+
+.rubrique {
+  display: block;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--rayon-sm);
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    color var(--duree-courte) var(--courbe),
+    background-color var(--duree-courte) var(--courbe);
+}
+
+.rubrique:hover {
+  color: var(--texte);
+  background-color: var(--verre-fond);
+}
+
+/* La rubrique courante : fond d'accent très dilué et texte en --accent-texte.
+   Pas de soulignement en plus — `aria-current` porte déjà l'information pour
+   qui ne voit pas la page, et un trait sous un lien dans une barre se confond
+   avec un survol.
+
+   --accent-texte et non --primary : l'en-tête est collante, donc elle se
+   trouve en permanence sous le halo sarcelle du haut de page, et --accent-soft
+   ajoute encore sa propre teinte. --primary y tombait à 3,2:1 — l'entrée
+   ACTIVE était le texte le MOINS lisible de la barre, les inactives étant à
+   5,3:1 en --texte-doux. L'inversion exacte de la hiérarchie voulue. */
+.rubriqueCourante,
+.rubriqueCourante:hover {
+  color: var(--accent-texte);
+  background-color: var(--accent-soft);
+}
+
+/* ── Les actions de droite ──────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+  flex: none;
+}
+
+/* Le déclencheur de la visite guidée. Dessiné comme un lien discret et non
+   comme un bouton : c'est une aide permanente, elle ne doit pas entrer en
+   concurrence avec « S'inscrire » juste à côté. */
+.aide {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-1);
+  padding: 0.35rem 0.55rem;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--rayon-sm);
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    color var(--duree-courte) var(--courbe),
+    background-color var(--duree-courte) var(--courbe);
+}
+
+/* Même paire que la rubrique courante, donc même jeton de texte. */
+.aide:hover {
+  color: var(--accent-texte);
+  background-color: var(--accent-soft);
+}
+
+.pictoAide {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+}
+
+.compte {
+  padding: 0.35rem 0.55rem;
+  border-radius: var(--rayon-sm);
+  color: var(--texte);
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  max-width: 11rem;
+  /* Un nom long ne pousse pas la barre : il se coupe. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compte:hover {
+  color: var(--accent-texte);
+  background-color: var(--accent-soft);
+}
+
+/* ── Le contenu ─────────────────────────────────────────────────────────── */
+
+.contenu {
+  /* flex: 1 sur le <main> : le body est une colonne flex (globals.css), donc
+     c'est ce qui colle le pied en bas d'une page courte, sans hauteur de
+     viewport calculée ni position fixe. */
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  padding: var(--espace-6) var(--espace-4) var(--espace-8);
+  /* Colonne flex, et ce n'est pas décoratif : avant que l'enveloppe soit
+     montée par la disposition racine, la page de connexion était un enfant
+     DIRECT du <body>, lui-même en colonne flex, et son `flex: 1` la centrait
+     verticalement. En devenant enfant de ce <main>, ce `flex: 1` n'avait plus
+     de conteneur flex pour le lire et le centrage s'arrêtait en silence.
+     Pour une page qui ne demande rien, un enfant unique de colonne flex se
+     comporte comme un bloc : rien ne change ailleurs. */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Le pied ────────────────────────────────────────────────────────────── */
+
+.pied {
+  margin-top: auto;
+  border-top: 1px solid var(--verre-bordure);
+  background-color: var(--verre-fond);
+}
+
+.piedInterieur {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espace-5);
+  width: 100%;
+  max-width: var(--largeur-page);
+  margin: 0 auto;
+  padding: var(--espace-6) var(--espace-4);
+}
+
+.piedMarque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+  /* Mesure de lecture : au-delà, la phrase sur les avis vérifiés traverse
+     l'écran et devient illisible. */
+  max-width: 34rem;
+}
+
+.piedPhrase {
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+}
+
+.piedLiens {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+  font-size: var(--txt-sm);
+}
+
+/* ── Le lien d'évitement ──────────────────────────────────────────────────
+   Hors de l'écran tant qu'il n'a pas le focus, et PAS en display: none, qui
+   le retirerait de l'ordre de tabulation — donc de sa seule utilité. */
+
+.evitement {
+  position: fixed;
+  top: var(--espace-3);
+  left: var(--espace-3);
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background-color: var(--nuit-haut);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-sm);
+  color: var(--primary);
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  box-shadow: var(--ombre-2);
+  /* Remonté au-dessus du bord supérieur : il redescend au focus. */
+  transform: translateY(-150%);
+  transition: transform var(--duree-courte) var(--courbe);
+}
+
+.evitement:focus-visible {
+  transform: translateY(0);
+}
+
+/* Le texte réservé aux lecteurs d'écran est la classe globale
+   `.lecture-seule` de globals.css : voir Enveloppe.tsx. */
+
+/* ── Écrans étroits ───────────────────────────────────────────────────────
+   La barre passe sur deux rangs : marque et actions en haut, navigation
+   dessous sur toute la largeur. L'ordre visuel suit l'ordre du document, donc
+   la tabulation reste cohérente avec ce qu'on voit. */
+
+@media (max-width: 52rem) {
+  .barre {
+    flex-wrap: wrap;
+    gap: var(--espace-3);
+  }
+
+  .navigation {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .actions {
+    margin-left: auto;
+  }
+
+  .contenu {
+    padding-top: var(--espace-5);
+  }
+}

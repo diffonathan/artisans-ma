@@ -1,0 +1,85 @@
+/* Aucune couleur en dur : les barres reprennent la matière du verre. */
+
+.squelette {
+  display: grid;
+  gap: var(--espace-4);
+}
+
+/* Une colonne de cartes pleine largeur. */
+.colonne {
+  grid-template-columns: 1fr;
+  gap: var(--espace-5);
+}
+
+/* La même largeur de colonne que les grilles de résultats : le squelette
+   occupe exactement la place que prendra le contenu, donc la page ne saute
+   pas quand il arrive. */
+.grille {
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+
+/* `div.carte` et non `.carte` : `Carte` pose déjà ses propres classes, et une
+   spécificité égale laisserait l'ordre d'insertion des modules décider qui
+   gagne — ce qui change d'une construction à l'autre. */
+div.carte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+/* ── La variante « écran entier », pour les loading.tsx ─────────────────── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+}
+
+.enTete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.barre {
+  display: block;
+  height: 0.75rem;
+  border-radius: var(--rayon-pleine);
+  background-color: var(--verre-fond-haut);
+  animation: pulsation 1.4s var(--courbe) infinite;
+}
+
+/* La première barre est la place d'un titre : plus haute, pour que la hauteur
+   totale du squelette corresponde à celle d'une carte remplie. */
+.barreTitre {
+  height: 1.1rem;
+}
+
+/* Les trois barres de l'en-tête reprennent les hauteurs réelles des éléments
+   qu'elles remplacent : --txt-sm pour le surtitre, --txt-xl pour le titre,
+   une ligne de prose pour le chapeau. C'est ce qui fait que la page ne saute
+   pas quand le vrai contenu arrive. */
+.barreSurtitre {
+  height: 0.875rem;
+  width: min(30%, 12rem);
+}
+
+.barreGrandTitre {
+  height: 2rem;
+  width: min(55%, 22rem);
+}
+
+.barreChapeau {
+  height: 0.875rem;
+  width: min(80%, 42rem);
+}
+
+@keyframes pulsation {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}

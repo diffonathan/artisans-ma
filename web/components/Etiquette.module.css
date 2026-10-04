@@ -1,0 +1,67 @@
+/* Cinq variantes, un seul patron : fond translucide de la teinte, bordure de
+   la même teinte plus dense, texte à pleine teinte. Les jetons `*-soft` et
+   `*-border` de globals.css existent exactement pour cela — c'est pourquoi
+   aucune opacité n'est recalculée ici. */
+
+.etiquette {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-1);
+  padding: 0.2rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: var(--rayon-pleine);
+  font-size: var(--txt-xs);
+  font-weight: 600;
+  /* Les libellés sont courts ; la cassure d'un « À payer » en deux lignes
+     ferait grandir une ligne de tableau entière. */
+  white-space: nowrap;
+  /* Majuscules initiales déjà dans le libellé : pas de text-transform, qui
+     ferait perdre l'accent de « À payer » sur d'anciens navigateurs. */
+  line-height: 1.4;
+}
+
+.dense {
+  padding: 0.1rem 0.45rem;
+  font-weight: 500;
+}
+
+/* Le neutre n'a pas de teinte propre : il emprunte la matière du verre. C'est
+   ce qui le fait LIRE comme une absence d'état plutôt que comme un cinquième
+   rôle de couleur. */
+.neutre {
+  background-color: var(--verre-fond-haut);
+  border-color: var(--verre-bordure);
+  color: var(--texte-doux);
+}
+
+/* --accent-texte et non --primary, à la différence des quatre autres rôles
+   qui tiennent avec leur teinte pleine. La raison est que le fond de cette
+   pastille est de la MÊME couleur que son texte, très dilué : --accent-soft
+   éclaircit le fond vers le texte et ramène la paire à 4,4:1 au mieux, 3,4:1
+   dans l'en-tête. Le même --primary sur du verre nu passerait. */
+.accent {
+  background-color: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent-texte);
+}
+
+.or {
+  background-color: var(--or-soft);
+  border-color: var(--or-border);
+  color: var(--or);
+}
+
+.vert {
+  background-color: var(--vert-soft);
+  border-color: var(--vert-border);
+  color: var(--vert);
+}
+
+.rouge {
+  background-color: var(--rouge-soft);
+  border-color: var(--rouge-border);
+  color: var(--rouge);
+}
+
+/* Le texte réservé aux lecteurs d'écran est la classe globale
+   `.lecture-seule` de globals.css : voir Etiquette.tsx. */

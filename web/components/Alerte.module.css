@@ -1,0 +1,80 @@
+/* Toutes les teintes sont des jetons de CHARTE.md. Le texte reste en --texte
+   dans les trois tons : du rouge sur un fond rouge translucide perd le
+   contraste, alors que la bordure, le fond et le losange disent déjà la nature
+   du message. Seul le LOSANGE prend la couleur du ton — un glyphe de douze
+   pixels n'a pas de texte à porter. */
+
+.alerte {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-2);
+  padding: var(--espace-3) var(--espace-4);
+  border: 1px solid;
+  border-radius: var(--rayon-sm);
+  color: var(--texte);
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+}
+
+.marqueur {
+  flex: none;
+  font-size: 0.8em;
+  /* Aligné sur la première ligne du texte, et non sur le centre du bloc : un
+     message de trois lignes verrait sinon son losange flotter au milieu. */
+  line-height: 1.9;
+}
+
+.corps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  /* Sans cela, un mot long — une adresse recopiée dans un refus — élargit le
+     bloc au-delà de la carte au lieu de se couper. */
+  min-width: 0;
+}
+
+.titre {
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.texte {
+  /* Mesure de lecture : au-delà, une phrase de refus traverse l'écran. */
+  max-width: 62ch;
+}
+
+/* ── Les trois tons ───────────────────────────────────────────────────────── */
+
+.rouge {
+  border-color: var(--rouge-border);
+  background-color: var(--rouge-soft);
+}
+
+.rouge .marqueur {
+  color: var(--rouge);
+}
+
+.or {
+  border-color: var(--or-border);
+  background-color: var(--or-soft);
+}
+
+.or .marqueur {
+  color: var(--or);
+}
+
+.accent {
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+}
+
+/* --accent-texte et non --primary : le losange est posé sur --accent-soft
+   au-dessus du verre, exactement la superposition où --primary tombe à 3,2:1.
+   C'est la leçon de contraste de CHARTE.md. */
+.accent .marqueur {
+  color: var(--accent-texte);
+}
+
+.accent .titre {
+  color: var(--accent-texte);
+}

@@ -1,0 +1,16 @@
+/**
+ * L'écran d'attente de /mon-compte.
+ *
+ * Next enveloppe `page.tsx` dans une frontière `<Suspense>` dont ceci est le
+ * repli : il s'affiche DANS le `<main>` de l'enveloppe, donc l'en-tête et la
+ * navigation restent à l'écran et cliquables pendant que l'API répond.
+ *
+ * Deux blocs : l'identité et le profil métier. Ce n'est pas une liste, donc
+ * les cartes ne se répètent pas.
+ */
+import type { ReactNode } from 'react';
+import { Squelette } from '@/components/Squelette';
+
+export default function Attente(): ReactNode {
+  return <Squelette cartes={2} lignes={4} annonce="Chargement de votre compte…" enTete />;
+}

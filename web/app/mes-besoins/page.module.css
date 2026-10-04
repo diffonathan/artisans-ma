@@ -1,0 +1,151 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   MES CHANTIERS — la liste des besoins du client
+
+   Aucune couleur en dur : tout est var(--…), défini dans app/globals.css
+   d'après CHARTE.md. En particulier, le texte d'accent prend --accent-texte
+   et jamais --primary, qui tombe à 3,2:1 sur le verre.
+
+   ── Spécificité : pourquoi `a.ligne` et non `.ligne` ──────────────────────
+   Les cartes reçoivent `.carte` de Carte.module.css, qui pose
+   `display: block`. Deux sélecteurs d'une seule classe se départagent par
+   l'ORDRE des feuilles, lequel dépend de l'ordre des imports — une
+   dépendance invisible qu'un réarrangement casserait sans erreur. Un
+   sélecteur `élément + classe` l'emporte par spécificité, donc quel que soit
+   l'ordre. Cette forme n'est employée QUE là où il faut vaincre
+   `display: block`.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+  /* Pas de `padding-block` : le <main> de l'enveloppe en pose déjà un, et
+     l'ajouter ici donnait à ces pages une respiration de haut différente des
+     autres sans qu'on voie d'où elle venait. */
+}
+
+/* ── L'en-tête ───────────────────────────────────────────────────────────── */
+
+.enTete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--espace-5);
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+  margin-bottom: var(--espace-2);
+}
+
+.titre {
+  margin-bottom: var(--espace-3);
+}
+
+.phrase {
+  /* Une colonne étroite : deux phrases de consigne se relisent mal sur
+     cent-vingt caractères de large. */
+  max-width: 56ch;
+  color: var(--texte-doux);
+}
+
+/* ── La liste ────────────────────────────────────────────────────────────── */
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+a.ligne {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.ligneHaut {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espace-4);
+}
+
+.ligneTitre {
+  font-size: var(--txt-md);
+  font-weight: 600;
+  /* Le titre vient de la saisie du client : il peut être long, et il ne doit
+     pas écraser l'étiquette de statut à sa droite. */
+  min-width: 0;
+}
+
+.ligneMetier {
+  font-size: var(--txt-sm);
+  color: var(--accent-texte);
+}
+
+.ligneBas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--espace-2) var(--espace-5);
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.compteur {
+  color: var(--texte);
+}
+
+.date {
+  color: var(--texte-faible);
+}
+
+/* ── État vide et panne ──────────────────────────────────────────────────── */
+
+.vide,
+.panne {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-4);
+}
+
+/* La panne se distingue de l'état vide par un liseré, et non par un fond
+   rouge : l'écran annonce un échec de LECTURE, pas la perte des données, et
+   une carte rouge pleine dirait le contraire de la phrase qu'elle porte. */
+.panne {
+  border-color: var(--rouge-border);
+}
+
+.videTitre {
+  font-size: var(--txt-md);
+  font-weight: 600;
+}
+
+.videTexte {
+  max-width: 64ch;
+  color: var(--texte-doux);
+}
+
+/* ── Téléphone ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 36rem) {
+  .enTete {
+    align-items: stretch;
+  }
+
+  .ligneHaut {
+    /* L'étiquette passe sous le titre : côte à côte, un titre de huit mots et
+       une pastille se disputent trois centimètres. */
+    flex-direction: column;
+    gap: var(--espace-2);
+  }
+}

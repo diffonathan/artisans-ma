@@ -1,0 +1,96 @@
+/* Toutes les teintes viennent des jetons. Les étoiles prennent leur couleur du
+   palier posé sur le conteneur, et la propagent par `currentColor` : un seul
+   endroit décide, les deux rangées suivent. */
+
+.note {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-2);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.normal {
+  font-size: var(--txt-sm);
+}
+
+.grand {
+  font-size: var(--txt-md);
+}
+
+/* ── Les étoiles ──────────────────────────────────────────────────────────
+   Dimensions en em : la rangée suit le corps du composant, donc la variante
+   `grand` n'a rien à redéclarer. */
+
+.etoiles {
+  position: relative;
+  display: block;
+  width: 5.6em;
+  height: 1.12em;
+  flex: none;
+}
+
+.rangee {
+  display: block;
+  width: 5.6em;
+  height: 1.12em;
+}
+
+/* Le fond de la rangée : la forme reste lisible, la couleur s'efface. Même
+   teinte que le texte faible, pour ne pas introduire un gris de plus. */
+.vides {
+  color: var(--texte-faible);
+  opacity: 0.4;
+}
+
+/* Le recadrage. `overflow: hidden` sur une largeur en pourcentage : la rangée
+   pleine garde sa taille réelle à l'intérieur, donc la coupe tombe au milieu
+   d'une étoile sans la déformer. */
+.pleines {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ── Les paliers ───────────────────────────────────────────────────────── */
+
+.haute {
+  color: var(--vert);
+}
+
+/* Le palier moyen n'a pas de couleur propre : il prend le texte doux. Une
+   quatrième teinte « tiède » n'existe pas dans la charte, et l'inventer ici
+   serait exactement l'interdiction du fichier. */
+.moyenne {
+  color: var(--texte-doux);
+}
+
+.basse {
+  color: var(--rouge);
+}
+
+/* Pas de `font-size` ici, et ce n'est pas un oubli : `.normal` ou `.grand` est
+   TOUJOURS posé à côté, donc le corps est déjà donné. Le redéclarer écrasait
+   la variante `grand` — même spécificité, et ce bloc est plus bas dans le
+   fichier —, si bien que « Pas encore d'avis » sortait en --txt-sm même
+   demandé en grand. Même principe que .etoiles plus haut. */
+.sansAvis {
+  color: var(--texte-faible);
+  font-style: italic;
+}
+
+/* La valeur hérite la couleur du palier ; seule la graisse la détache. */
+.valeur {
+  font-weight: 600;
+}
+
+/* Le compte d'avis revient au texte doux : il mesure la FIABILITÉ de la note,
+   il n'est pas la note. Le porter dans la couleur du palier ferait croire que
+   « 80 avis » est lui-même un bon ou un mauvais signe. */
+.compte {
+  color: var(--texte-doux);
+  font-weight: 400;
+}
+
+/* Hors du flux visuel, dans l'arbre d'accessibilité : la recette est la classe
+   globale `.lecture-seule` de globals.css, voir Note.tsx. */

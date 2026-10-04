@@ -1,0 +1,18 @@
+/* Une distance est une donnée de repérage, pas une valeur marchande : elle
+   reste en texte doux et ne touche ni à --or ni aux couleurs de direction. */
+
+.distance {
+  display: inline-flex;
+  align-items: baseline;
+  color: var(--texte-doux);
+  font-size: var(--txt-sm);
+  white-space: nowrap;
+}
+
+/* L'unité revient en DM Sans et perd l'alignement tabulaire, qui n'a de sens
+   que sur des chiffres. */
+.unite {
+  font-family: var(--police-texte);
+  font-variant-numeric: normal;
+  font-size: 0.9em;
+}

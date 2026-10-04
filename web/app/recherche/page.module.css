@@ -1,0 +1,338 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /recherche — la page et ses filtres
+
+   Aucune couleur en dur : tout est var(--…), défini dans app/globals.css
+   d'après CHARTE.md. Azeret Mono n'arrive que par la classe globale
+   `.nombre`, posée sur des nombres et sur rien d'autre.
+
+   ── Spécificité : pourquoi `div.regle` et `a.resultat` ────────────────────
+   `Carte` et `CarteLien` reçoivent `.carte` de Carte.module.css, qui pose
+   `display: block`. Deux sélecteurs d'une seule classe se départagent par
+   l'ORDRE des feuilles, lequel dépend de l'ordre des imports — une
+   dépendance invisible qu'un réarrangement casserait sans erreur. Un
+   sélecteur `élément + classe` l'emporte par spécificité, donc dans tous les
+   cas. Cette forme ne sert QUE là où il faut vaincre `display: block`.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   L'OUVERTURE, ET LA RÈGLE DU PRODUIT
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.ouverture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.titre {
+  /* Un titre de page de recherche n'a pas besoin du corps de l'accueil : le
+     contenu utile est le formulaire, juste dessous. */
+  font-size: var(--txt-xl);
+}
+
+div.regle {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  max-width: 78ch;
+  /* Un liseré d'accent sur le bord d'attaque : c'est la règle de lecture de
+     l'écran, pas une carte de contenu. Même traitement que le rappel de
+     parcours de l'accueil, pour que les deux se lisent pareil. */
+  border-left: 3px solid var(--primary);
+  color: var(--texte-doux);
+}
+
+.regleExemple {
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES FILTRES
+
+   Une grille qui se replie toute seule : `auto-fit` et non un nombre de
+   colonnes, pour que trois listes passent de 3 à 2 à 1 colonne sans requête
+   de média. 13rem est la largeur en dessous de laquelle « Note minimale » se
+   coupe en deux lignes.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* La matière vient de la classe globale `.verre`, posée sur le <form> par
+   Filtres.tsx : fond, bordure, flou, liseré et ombre ne sont donc PAS
+   recopiés ici. Ce module ne règle que la grille et le rythme interne — la
+   même division du travail que `Carte`, qui n'est pas utilisable ici parce
+   qu'un formulaire n'est pas un <div>. */
+.filtres {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--espace-4) var(--espace-5);
+  align-items: start;
+  padding: var(--espace-5);
+}
+
+/* Les trois listes occupent une cellule chacune. Nommées pour que l'ordre
+   visuel reste lisible dans le JSX sans compter les enfants. */
+.filtreMetier,
+.filtreVille,
+.filtreNote {
+  grid-column: span 1;
+}
+
+/* ── Le point exact, quand il remplace la ville ─────────────────────────── */
+
+.filtrePosition {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-2);
+  min-width: 0;
+}
+
+/* Un faux libellé : il n'y a pas de contrôle à étiqueter ici (les coordonnées
+   voyagent en champs cachés), mais la colonne doit garder le même rythme que
+   les listes voisines, dont l'étiquette occupe cette ligne. */
+.libellePosition {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  color: var(--texte-doux);
+}
+
+.position {
+  font-size: var(--txt-sm);
+  color: var(--accent-texte);
+  /* Les coordonnées ne se coupent pas entre la latitude et la longitude. */
+  text-wrap: balance;
+}
+
+/* ── La case à cocher ──────────────────────────────────────────────────── */
+
+.filtreCases {
+  display: flex;
+  align-items: center;
+  /* La case s'aligne sur les contrôles et non sur les étiquettes : elle n'a
+     pas d'étiquette au-dessus, donc sans cette marge elle flotterait plus
+     haut que les listes. */
+  padding-top: 1.6rem;
+}
+
+.case {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-3);
+  font-size: var(--txt-sm);
+  cursor: pointer;
+}
+
+.caseAide {
+  display: block;
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+}
+
+/* ── Les actions ───────────────────────────────────────────────────────── */
+
+.filtreActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-3);
+  padding-top: 1.6rem;
+}
+
+.reinitialiser {
+  font-size: var(--txt-sm);
+  /* Les liens prennent --primary dans globals.css ; sur ce fond de verre, le
+     texte d'accent est --accent-texte. C'est la leçon de contraste de la
+     charte : --primary reste aux fonds, aux traits et au focus. */
+  color: var(--accent-texte);
+}
+
+/* Toujours dans le flux, même vide : une région aria-live créée au moment du
+   message n'est pas annoncée partout. `:empty` retire seulement sa place. */
+.messagePosition {
+  grid-column: 1 / -1;
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.messagePosition:empty {
+  display: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES ÉTATS : RIEN À CHERCHER, RIEN TROUVÉ, PANNE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.etat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  max-width: 70ch;
+}
+
+.etatTitre {
+  font-size: var(--txt-lg);
+}
+
+.etatTexte {
+  color: var(--texte-doux);
+}
+
+/* Une liste à puces ordinaire, et NON un conteneur flex : un `li` devenu
+   élément flex perd son marqueur sur une partie des moteurs, et l'état vide
+   est précisément l'écran qu'on ne relit jamais. L'écart entre les éléments
+   passe donc par une marge. */
+.etatListe {
+  /* La puce reste dans la carte : `list-style-position` par défaut la pose
+     hors du cadre, où le padding de la carte la coupe. */
+  padding-left: var(--espace-5);
+  color: var(--texte-doux);
+}
+
+.etatListe li + li {
+  margin-top: var(--espace-2);
+}
+
+.etatListe li::marker {
+  color: var(--primary);
+}
+
+.etatRemarque {
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+/* Le rouge est le rôle « erreur » de la charte, et il ne sert qu'ici. */
+div.etatPanne {
+  border-color: var(--rouge-border);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES RÉSULTATS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.resultats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.compte {
+  color: var(--texte-doux);
+}
+
+.liste {
+  list-style: none;
+  display: grid;
+  /* 18rem : en dessous, une raison sociale de trois mots et le badge
+     « vérifié » ne tiennent plus sur la même ligne. */
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--espace-4);
+}
+
+.element {
+  display: flex;
+  min-width: 0;
+}
+
+a.resultat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  width: 100%;
+}
+
+.resultatTete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-2) var(--espace-3);
+}
+
+.raisonSociale {
+  font-size: var(--txt-md);
+  /* Pas de `text-wrap: balance` hérité des titres : sur une carte étroite il
+     produit des lignes d'un mot. */
+  text-wrap: pretty;
+}
+
+/* ── Le badge « vérifié » ──────────────────────────────────────────────────
+   Rôle « valeur » de la charte, donc --or : la vérification est ce qui donne
+   sa valeur au profil, et c'est la seule chose non monétaire à laquelle la
+   charte accorde cette teinte (CHARTE.md, tableau des quatre rôles). */
+
+.verifie {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-1);
+  flex: none;
+  padding: 0.15rem 0.5rem;
+  font-size: var(--txt-xs);
+  font-weight: 500;
+  color: var(--or);
+  background-color: var(--or-soft);
+  border: 1px solid var(--or-border);
+  border-radius: var(--rayon-pleine);
+}
+
+.pictoVerifie {
+  width: 0.85em;
+  height: 0.85em;
+}
+
+.metiers {
+  font-size: var(--txt-sm);
+  color: var(--accent-texte);
+}
+
+.lieu {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+  /* Collée en bas : les cartes d'une même rangée alignent alors leur dernière
+     ligne, même quand l'une a deux métiers et l'autre cinq. */
+  margin-top: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE RENVOI VERS L'AUTRE PARCOURS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.appui {
+  max-width: 70ch;
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TÉLÉPHONE
+
+   Une seule requête de média : le reste de la page se replie par `auto-fit`.
+   Sous 36rem, les boutons d'action prennent toute la largeur, parce que trois
+   cibles tactiles côte à côte sur 320 px deviennent trop étroites.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 36rem) {
+  .filtres {
+    padding: var(--espace-4);
+  }
+
+  .filtreCases,
+  .filtreActions {
+    padding-top: 0;
+  }
+
+  .filtreActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reinitialiser {
+    padding-top: var(--espace-2);
+    text-align: center;
+  }
+}

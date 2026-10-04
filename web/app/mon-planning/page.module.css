@@ -1,0 +1,247 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   /mon-planning
+
+   Importé aussi par `TerminerPrestation.tsx`, qui vit dans la carte de
+   l'intervention.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  /* Ni largeur, ni marge, ni padding : le <main> de l'enveloppe
+     (`.contenu` dans Enveloppe.module.css) pose déjà exactement cette
+     largeur de page et ce rembourrage. Les redéclarer ici doublait la
+     gouttière latérale et resserrait le contenu de ces quatre pages par
+     rapport à toutes les autres. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-6);
+}
+
+.ouverture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  max-width: 68ch;
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.titre {
+  font-size: var(--txt-xl);
+  line-height: var(--interligne-serre);
+  font-weight: 600;
+}
+
+.chapeau {
+  font-size: var(--txt-md);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+}
+
+.compte {
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+/* ── Les interventions ──────────────────────────────────────────────────── */
+
+/* Une seule colonne, plus large que sur les autres écrans : une intervention
+   porte une adresse postale, qui ne se coupe pas bien en deux colonnes. */
+.liste {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.intervention {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+}
+
+.enTete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espace-3);
+}
+
+.titreIntervention {
+  font-size: var(--txt-md);
+  line-height: var(--interligne-serre);
+  font-weight: 600;
+}
+
+/* Le créneau : le jour est de la prose, les heures sont des nombres. La
+   séparation existe pour que Azeret Mono ne touche que la seconde moitié. */
+.creneau {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--espace-3);
+}
+
+.creneauJour {
+  font-size: var(--txt-base);
+  color: var(--texte);
+  /* La première lettre du jour arrive en minuscule d'Intl. */
+  text-transform: capitalize;
+}
+
+.creneauHeures {
+  padding: var(--espace-1) var(--espace-3);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-pleine);
+  background-color: var(--accent-soft);
+  color: var(--accent-texte);
+  font-size: var(--txt-sm);
+}
+
+/* ── Le bloc des coordonnées ────────────────────────────────────────────── */
+
+/* Encadré, parce que c'est la donnée que la place de marché ne livre qu'ici.
+   Le liseré est en --primary : une bordure n'a pas de contraste de texte à
+   tenir. */
+.coordonnees {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  padding: var(--espace-4);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-md);
+  background-color: var(--accent-soft);
+}
+
+.mentionCoordonnees {
+  font-size: var(--txt-xs);
+  letter-spacing: 0.02em;
+  color: var(--accent-texte);
+}
+
+.adresse {
+  font-size: var(--txt-base);
+  line-height: var(--interligne-normal);
+  /* Une adresse marocaine saisie à la main contient des retours à la ligne.
+     Les conserver vaut mieux que recoller « Rue … Imm. … Appt … » en un bloc. */
+  white-space: pre-line;
+}
+
+.telephone {
+  color: var(--accent-texte);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.telephone:hover {
+  color: var(--texte);
+}
+
+.sansTelephone {
+  color: var(--texte-faible);
+  font-size: var(--txt-sm);
+}
+
+/* ── Les paires libellé / valeur ────────────────────────────────────────── */
+
+.paires {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-5);
+}
+
+.paire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+}
+
+.paire dt {
+  font-size: var(--txt-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+}
+
+.paire dd {
+  font-size: var(--txt-sm);
+  color: var(--texte);
+}
+
+/* ── La phase, et l'achèvement ──────────────────────────────────────────── */
+
+.phase {
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+  padding-top: var(--espace-3);
+  border-top: 1px solid var(--verre-bordure);
+}
+
+.achevement {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-3);
+}
+
+.achevementAvertissement {
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+  padding: var(--espace-3);
+  border: 1px solid var(--or-border);
+  border-radius: var(--rayon-sm);
+  background-color: var(--or-soft);
+  max-width: 72ch;
+}
+
+.achevementActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+}
+
+/* ── Vide, erreur, chargement ───────────────────────────────────────────── */
+
+.etatVide,
+.etatEchec {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espace-3);
+  max-width: 62ch;
+  font-size: var(--txt-sm);
+  line-height: var(--interligne-normal);
+  color: var(--texte-doux);
+}
+
+.titreEtat {
+  font-size: var(--txt-md);
+  font-weight: 600;
+  color: var(--texte);
+}
+
+.phraseEchec {
+  color: var(--rouge);
+}
+
+.actionsEtat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: var(--espace-5) var(--espace-4) var(--espace-7);
+  }
+
+  .paires {
+    gap: var(--espace-4);
+  }
+}

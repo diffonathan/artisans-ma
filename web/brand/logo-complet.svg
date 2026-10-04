@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 241 64" width="241" height="64"
+     role="img" aria-labelledby="artisans-complet-titre artisans-complet-desc">
+  <title id="artisans-complet-titre">Artisans.ma</title>
+  <desc id="artisans-complet-desc">Le poinçon d'Artisans.ma suivi du nom « Artisans.ma », dont le suffixe de pays est en sarcelle.</desc>
+
+  <defs>
+    <linearGradient id="artisans-poincon-champ-complet" gradientUnits="userSpaceOnUse"
+                    x1="36.9" y1="50.4" x2="27.1" y2="13.6">
+      <stop offset="0" stop-color="#7ac4be"/>
+      <stop offset="1" stop-color="#0a736a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Le symbole est repris trait pour trait de logo.svg, dans sa boîte de 64.
+       Une version « adaptée au lockup » est le moyen le plus sûr de finir avec
+       deux marques légèrement différentes en circulation. Seul l'identifiant du
+       dégradé change, pour que les deux fichiers puissent être inlinés dans la
+       même page sans que l'un capture le dégradé de l'autre. -->
+  <path d="M20 7 Q32 5 44 7 Q57 7 57 20 Q59 32 57 44 Q57 57 44 57 Q32 59 20 57 Q7 57 7 44 Q5 32 7 20 Q7 7 20 7 Z" fill="#f9a825"/>
+  <path d="M22.16 11.5 Q32 9.86 41.84 11.5 Q52.5 11.5 52.5 22.16 Q54.14 32 52.5 41.84 Q52.5 52.5 41.84 52.5 Q32 54.14 22.16 52.5 Q11.5 52.5 11.5 41.84 Q9.86 32 11.5 22.16 Q11.5 11.5 22.16 11.5 Z" fill="url(#artisans-poincon-champ-complet)"/>
+  <path d="M21.5 32.5 L29.9 40.9 L42.1 24.7" fill="none" stroke="#ffffff"
+        stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- LE NOM. Le jeton police-dm-sans d'abord : inliné dans le DOM, ce fichier
+       hérite alors de la famille HASHÉE que next/font a réellement chargée, et
+       non d'une « DM Sans » que le navigateur n'a pas forcément. Les replis
+       servent au cas où le fichier est ouvert seul, ou chargé en img, où var()
+       ne résout pas.
+       Graisse 600 et interlettrage -0,02em : exactement le réglage des titres de
+       globals.css, pour que le nom de la marque et un h1 soient la même écriture
+       et non deux voisines.
+       Ligne de base à 42 : l'encre de « Artisans.ma » en DM Sans 600 à 30
+       mesure 20 unités de haut et ne descend pas sous la ligne de base (aucune
+       jambage) — mesuré par actualBoundingBox, pas estimé d'après le ratio de
+       capitale, qui donnait 21 et décalait le mot d'une demi-unité. Centrer ces
+       20 unités sur l'axe du poinçon (y = 32) place la ligne de base à 32 + 10.
+       La largeur de la boîte, 241, vient de la même mesure : le mot s'achève à
+       234,7, et 6 unités de garde à droite répondent aux 6 qui séparent la
+       plaque du bord gauche. -->
+  <text x="82" y="42"
+        font-family="var(--police-dm-sans), 'DM Sans', system-ui, sans-serif"
+        font-size="30" font-weight="600" letter-spacing="-0.6" fill="#f4f4f5">Artisans<!--
+     Le suffixe de pays en sarcelle et non en or : l'or est le rôle « valeur » de
+     la charte, réservé aux dirhams et à l'attestation, et il est déjà pris par
+     le cerne du poinçon. Le .ma revient donc à l'accent, rôle « action »,
+     c'est-à-dire la plateforme elle-même.
+  --><tspan fill="#0d9488">.ma</tspan></text>
+</svg>

@@ -1,0 +1,618 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   LA PAGE TECHNIQUE
+
+   Aucune couleur en dur : tout est var(--…), défini dans app/globals.css
+   d'après CHARTE.md.
+
+   ── Les deux règles de la charte qui décident de presque tout ici ─────────
+   1. --accent-texte pour le TEXTE d'accent, --primary pour les fonds, les
+      traits et le contour de focus. Cette page est
+      pleine de petits libellés d'accent — étiquettes de section, intitulés de
+      pile, en-têtes de tableau — tous à 12 ou 14 px, là où --primary tombe
+      sous le seuil de contraste du texte courant.
+   2. Azeret Mono (classe globale `.nombre`) pour les NOMBRES seulement. Les
+      blocs de code prennent donc la monospace de repli du système, pas
+      --police-nombres : du code n'est pas un nombre.
+
+   ── Spécificité : pourquoi `div.limite` et non `.limite` ──────────────────
+   Les cartes reçoivent `.carte` de Carte.module.css, qui pose
+   `display: block`, et un `padding` de la même origine. Deux sélecteurs
+   d'une seule classe se départagent par l'ORDRE des feuilles, lequel dépend
+   de l'ordre des imports du fichier qui les consomme — une dépendance
+   invisible qu'un futur réarrangement casserait sans erreur. Un sélecteur
+   `élément + classe` l'emporte par spécificité, donc indépendamment de
+   l'ordre. Cette forme n'est employée QUE là où il faut vaincre une
+   déclaration de Carte.module.css.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-8);
+  /* Pas de `padding-block` : le <main> de l'enveloppe en pose déjà un, et
+     l'ajouter ici donnait à ces pages une respiration de haut différente des
+     autres sans qu'on voie d'où elle venait. */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   L'OUVERTURE ET LE SOMMAIRE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.ouverture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.surtitre {
+  font-size: var(--txt-sm);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  /* Du texte de 14 px : --accent-texte, pas --primary. */
+  color: var(--accent-texte);
+}
+
+.titre {
+  /* Le titre tient en deux lignes sur un écran large, et la colonne étroite
+     empêche la troisième de n'avoir qu'un mot. */
+  max-width: 44ch;
+}
+
+/* « mesurée » porte la thèse de la page. L'emphase est une couleur, pas une
+   inclinaison — d'où `font-style: normal` sur le <em>. --primary et non
+   --accent-texte : dans un <h1>, le seuil de contraste n'est que de 3:1, et
+   la teinte pleine se distingue mieux du corps de texte. */
+.appui {
+  font-style: normal;
+  color: var(--primary);
+}
+
+.chapeau {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  max-width: 62ch;
+  font-size: var(--txt-md);
+  color: var(--texte-doux);
+}
+
+/* Le sommaire : un panneau de verre, parce qu'il doit se lire comme un objet
+   de navigation et non comme le premier paragraphe de la page. */
+.sommaire {
+  margin-top: var(--espace-3);
+  padding: var(--espace-5);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-lg);
+  background-color: var(--verre-fond);
+  backdrop-filter: var(--verre-flou);
+  -webkit-backdrop-filter: var(--verre-flou);
+  box-shadow: inset 0 1px 0 var(--verre-lisere);
+}
+
+.titreSommaire {
+  font-size: var(--txt-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+  margin-bottom: var(--espace-4);
+}
+
+.listeSommaire {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: var(--espace-2);
+  list-style: none;
+}
+
+.lienSommaire {
+  display: flex;
+  align-items: baseline;
+  gap: var(--espace-3);
+  padding: var(--espace-3);
+  border-radius: var(--rayon-sm);
+  color: var(--texte);
+  transition: background-color var(--duree-courte) var(--courbe);
+}
+
+.lienSommaire:hover {
+  background-color: var(--accent-soft);
+  /* Le soulignement global des liens au survol ferait un trait sous deux
+     lignes de texte de tailles différentes : le fond suffit à l'indice, et le
+     titre change de couleur juste en dessous. */
+  text-decoration: none;
+}
+
+.rangSommaire {
+  font-size: var(--txt-sm);
+  color: var(--accent-texte);
+}
+
+.texteSommaire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-1);
+  min-width: 0;
+}
+
+.titreEntree {
+  font-size: var(--txt-sm);
+  font-weight: 600;
+  line-height: var(--interligne-serre);
+  transition: color var(--duree-courte) var(--courbe);
+}
+
+.lienSommaire:hover .titreEntree {
+  color: var(--accent-texte);
+}
+
+.resumeEntree {
+  font-size: var(--txt-xs);
+  line-height: var(--interligne-normal);
+  color: var(--texte-faible);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   UNE SECTION
+
+   `scroll-margin-top` et non une marge ordinaire : la cible d'une ancre doit
+   se poser sous l'en-tête collant. `scroll-padding-top` est déjà sur <html>
+   dans globals.css ; celui-ci le double pour les navigateurs qui n'honorent
+   que la marge de l'élément visé.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+  scroll-margin-top: var(--espace-7);
+}
+
+.etiquetteSection {
+  font-size: var(--txt-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.titreSection {
+  margin-top: calc(var(--espace-3) * -1);
+  max-width: 48ch;
+}
+
+.introSection {
+  max-width: 68ch;
+  font-size: var(--txt-md);
+  color: var(--texte-doux);
+}
+
+.titreSousPartie {
+  margin-top: var(--espace-4);
+  /* Un trait d'accent plutôt qu'un corps plus gros : la hiérarchie des titres
+     est déjà prise par h1/h2/h3, et un quatrième niveau de taille écraserait
+     les intertitres des cartes. */
+  padding-left: var(--espace-4);
+  border-left: 3px solid var(--primary);
+  font-size: var(--txt-lg);
+}
+
+.paragraphe {
+  max-width: 72ch;
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES VOLETS PAR DEUX — « ce que X ferait » / « ce que Y n'a pas »
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.paire {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  gap: var(--espace-4);
+}
+
+article.volet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+/* Le volet qui porte la BONNE réponse. Le liseré d'accent, et non le rôle
+   --vert : le vert dit « accepté » sur les statuts du domaine, et le
+   réemployer ici pour « c'est cette solution-là » brouillerait les deux
+   lectures dans la même application. */
+article.voletRetenu {
+  border-color: var(--accent-border);
+  box-shadow:
+    inset 0 1px 0 var(--verre-lisere),
+    inset 3px 0 0 var(--primary),
+    var(--ombre-2);
+}
+
+.titreVolet {
+  font-size: var(--txt-md);
+}
+
+.texteVolet {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES TROIS MÉCANISMES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.mecanismes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--espace-4);
+  list-style: none;
+}
+
+li.mecanisme {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.rangMecanisme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: var(--rayon-pleine);
+  /* Pastille : --primary est ici un FOND, son emploi d'origine. Le texte
+     dessus s'assombrit — même arbitrage que Bouton.module.css. */
+  background-color: var(--primary);
+  color: var(--nuit-median);
+  font-size: var(--txt-sm);
+  font-weight: 600;
+}
+
+.titreMecanisme {
+  font-size: var(--txt-md);
+}
+
+.texteMecanisme {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* La conséquence est la chute du bloc : elle se détache par un filet haut et
+   se cale en bas de la carte pour que les trois s'alignent. */
+.consequence {
+  margin-top: auto;
+  padding-top: var(--espace-3);
+  border-top: 1px solid var(--verre-bordure);
+  font-size: var(--txt-sm);
+  color: var(--accent-texte);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES BLOCS DE CODE
+
+   Pas de bibliothèque de coloration : rien n'est installé sur ce chantier, et
+   un extrait de six lignes se lit sans couleurs syntaxiques dès lors que la
+   police est à chasse fixe et l'indentation préservée.
+
+   `overflow-x: auto` sur un <pre> rend le bloc défilable à la souris mais
+   l'escamote au clavier, car il ne reçoit pas le focus. `tabindex` ne se pose
+   pas depuis une feuille de style — d'où `role` et `tabindex` absents ici et
+   la largeur des extraits tenue sous 80 colonnes à la source, pour qu'aucun
+   défilement ne soit nécessaire au-delà d'un téléphone.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.bloc {
+  overflow-x: auto;
+  padding: var(--espace-4);
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-md);
+  background-color: var(--nuit-median);
+  /* Du code n'est PAS un nombre : la charte réserve Azeret Mono aux nombres,
+     donc ce bloc prend la monospace de repli du système. */
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: var(--txt-xs);
+  line-height: 1.7;
+  color: var(--texte);
+  /* `pre` conserve les espaces ; `tab-size` évite qu'une tabulation venue
+     d'un copier-coller ouvre un gouffre de huit colonnes. */
+  tab-size: 2;
+}
+
+.enLigne {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-size: 0.92em;
+  padding: 0.05em 0.35em;
+  background-color: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--rayon-xs);
+  color: var(--texte);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.legendeCode {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.noteFigure {
+  max-width: 72ch;
+  font-size: var(--txt-sm);
+  color: var(--texte-faible);
+}
+
+/* La provenance d'une mesure, sous le bloc qui l'énonce. */
+.source {
+  font-size: var(--txt-xs);
+  color: var(--texte-faible);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA LIMITE ET LES ENCARTS
+
+   La limite porte --or, que la charte charge aussi de l'attention : « ce qui
+   reste non garanti » n'est pas une erreur (--rouge), c'est un avertissement
+   à lire. Et c'est le seul endroit de la page où --or sert à autre chose
+   qu'un montant, ce qui est admis parce qu'un montant et un avertissement ne
+   se croisent jamais dans le même composant.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+aside.limite {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-4);
+  border-color: var(--or-border);
+  box-shadow:
+    inset 0 1px 0 var(--verre-lisere),
+    inset 3px 0 0 var(--or),
+    var(--ombre-2);
+}
+
+.titreLimite {
+  font-size: var(--txt-md);
+  color: var(--or);
+}
+
+.texteLimite {
+  max-width: 72ch;
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+aside.encart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+}
+
+.texteEncart {
+  max-width: 72ch;
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES TABLEAUX
+
+   Le cadre est ce qui défile, pas le tableau : un <table> en
+   `overflow-x: auto` ignore la propriété. Trois colonnes de texte ne tiennent
+   pas sous 360 px, et replier un tableau en liste lui ferait perdre ce qui le
+   rend lisible — la comparaison colonne par colonne.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.cadreTableau {
+  overflow-x: auto;
+  border: 1px solid var(--verre-bordure);
+  border-radius: var(--rayon-md);
+  background-color: var(--verre-fond);
+}
+
+.tableau {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--txt-sm);
+}
+
+.legendeTableau {
+  padding: var(--espace-4);
+  text-align: left;
+  font-size: var(--txt-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+  border-bottom: 1px solid var(--verre-bordure);
+}
+
+.tableau thead th {
+  padding: var(--espace-3) var(--espace-4);
+  text-align: left;
+  font-size: var(--txt-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texte-faible);
+  border-bottom: 1px solid var(--verre-bordure);
+  white-space: nowrap;
+}
+
+.tableau tbody th {
+  padding: var(--espace-3) var(--espace-4);
+  text-align: left;
+  font-weight: 500;
+  color: var(--texte);
+}
+
+.tableau tbody td {
+  padding: var(--espace-3) var(--espace-4);
+  color: var(--texte-doux);
+}
+
+.tableau tbody tr + tr th,
+.tableau tbody tr + tr td {
+  border-top: 1px solid var(--verre-bordure);
+}
+
+/* La ligne qui porte le résultat intéressant : le lecteur doit la trouver
+   sans lire les autres. Un fond d'accent, et non une couleur de texte —
+   l'information est « c'est celle-là », pas « elle est positive ».
+
+   Préfixées par `.tableau` : les règles de cellules ci-dessus valent
+   (1 classe + 2 types), donc `.ligneRetenue th` seul PERDRAIT la graisse au
+   profit du 500 générique. Deux classes l'emportent sur une classe quel que
+   soit le nombre de types, et c'est la seule façon de ne pas dépendre de
+   l'ordre des déclarations dans ce fichier. */
+.tableau .ligneRetenue th,
+.tableau .ligneRetenue td {
+  background-color: var(--accent-soft);
+}
+
+.tableau .ligneRetenue th {
+  color: var(--texte);
+  font-weight: 600;
+}
+
+/* Même raison : `.tableau thead th` aligne à gauche avec (1 classe, 2 types). */
+.tableau .colonneNombre {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Les deux chiffres qu'on compare. Rôles de direction de la charte : le
+   résultat attendu en vert, celui qu'on cherche à éviter en rouge. */
+.chiffreBon {
+  color: var(--vert);
+  font-weight: 600;
+}
+
+.chiffreMauvais {
+  color: var(--rouge);
+  font-weight: 600;
+}
+
+.tableau .oui {
+  color: var(--vert);
+  font-weight: 600;
+}
+
+.tableau .non {
+  color: var(--rouge);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LES PIÈGES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.pieges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: var(--espace-4);
+  list-style: none;
+}
+
+li.piege {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.titrePiege {
+  font-size: var(--txt-md);
+  color: var(--accent-texte);
+}
+
+.textePiege {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA PILE ET LE DÉPÔT
+   ══════════════════════════════════════════════════════════════════════════ */
+
+div.blocPile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-5);
+}
+
+.pile {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--espace-5);
+}
+
+.couche {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+  min-width: 0;
+}
+
+.coucheCle {
+  font-size: var(--txt-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-texte);
+}
+
+.coucheValeur {
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.textePile {
+  max-width: 72ch;
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+.depot {
+  padding-top: var(--espace-4);
+  border-top: 1px solid var(--verre-bordure);
+  font-size: var(--txt-sm);
+  color: var(--texte-doux);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TÉLÉPHONE
+
+   Les grilles se replient toutes seules par `auto-fit`. Ce qui ne se replie
+   pas, c'est le rythme vertical : huit unités d'écart entre les sections
+   mangent un écran entier sur un petit appareil.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 40rem) {
+  .page {
+    gap: var(--espace-7);
+  }
+
+  .sommaire {
+    padding: var(--espace-4);
+  }
+
+  .titreSousPartie {
+    padding-left: var(--espace-3);
+  }
+}
+
+/* Le mouvement est réduit à la demande : les transitions de cette page ne
+   portent que de la couleur et un fond, mais la règle est globale au projet
+   et un écran ne décide pas seul d'y échapper. */
+@media (prefers-reduced-motion: reduce) {
+  .lienSommaire,
+  .titreEntree {
+    transition: none;
+  }
+}

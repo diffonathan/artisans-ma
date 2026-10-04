@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"
+     role="img" aria-labelledby="artisans-mono-titre artisans-mono-desc">
+  <title id="artisans-mono-titre">Artisans.ma</title>
+  <desc id="artisans-mono-desc">Le poinçon d'Artisans.ma en une seule couleur : le cadre du poinçon évidé, la coche au centre. Pour tampon, gravure ou fond coloré.</desc>
+
+  <!-- Une seule couleur, HÉRITÉE : currentColor prend la couleur du texte
+       environnant. Elle est écrite sur chaque tracé plutôt qu'une fois sur la
+       racine, parce que `fill` et `stroke` ne se résolvent pas de la même façon
+       selon le contexte d'insertion — et un logo qui disparaît quand on le place
+       autrement n'est pas monochrome, il est cassé. -->
+
+  <!-- LA PLAQUE DEVIENT UN CADRE ÉVIDÉ. En couleur, l'or est un aplat sous un
+       champ sarcelle ; ici il n'y a plus de second ton pour creuser ce champ, et
+       le remplir d'une seule encre noierait la coche. Le cadre reprend donc la
+       bande d'or : tracé de 5 unités posé sur la LIGNE MÉDIANE de cette bande
+       (réduction 0,92), de sorte que la silhouette extérieure et le bord
+       intérieur du cadre tombent là où ils tombent en couleur. -->
+  <path d="M20.96 9 Q32 7.16 43.04 9 Q55 9 55 20.96 Q56.84 32 55 43.04 Q55 55 43.04 55 Q32 56.84 20.96 55 Q9 55 9 43.04 Q7.16 32 9 20.96 Q9 9 20.96 9 Z" fill="none" stroke="currentColor" stroke-width="5"/>
+
+  <!-- LA COCHE, mêmes angles exactement (45,00° et -53,02°, rapport des branches
+       0,586), réduite de 0,92 autour de son centre et ramenée à 10 unités. Ce
+       n'est pas une coquetterie : en couleur, c'est le CONTRASTE or/sarcelle/
+       blanc qui sépare la coche du cadre, et 5,17 unités de champ suffisaient.
+       En monochrome les deux formes ont la même encre, et un vide trop mince se
+       referme au lissage — la coche devient une barre et le poinçon un carré
+       plein. Le vide mesuré ici est de 6,70 unités. D'où la règle à tenir si on
+       retouche ce fichier : ce vide est le dernier à sacrifier.
+       La réduction est UNIFORME, donc l'inclinaison des branches et leur rapport
+       sont inchangés : c'est le même glyphe, pas un cousin. -->
+  <path d="M22.34 32.5 L30.07 40.23 L41.29 25.32" fill="none" stroke="currentColor"
+        stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
