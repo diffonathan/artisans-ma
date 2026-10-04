@@ -1,0 +1,19 @@
+# Ce qui ne doit jamais entrer dans le contexte de construction.
+#
+# `node_modules` surtout : sans cette ligne, Docker envoie plus d'un gigaoctet
+# au démon avant même de lire le Dockerfile, et recopie des binaires compilés
+# pour Windows dans une image Alpine.
+**/node_modules
+**/.next
+**/dist
+**/coverage
+**/*.tsbuildinfo
+
+# Secrets : ils sont déjà ignorés par git, mais le contexte de construction
+# ne lit pas .gitignore.
+**/.env
+**/.env.local
+**/.env.*.local
+
+.git
+.github

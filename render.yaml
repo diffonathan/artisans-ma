@@ -1,0 +1,80 @@
+# Déploiement de la démonstration sur Render (offre gratuite).
+#
+# À importer depuis render.com → New → Blueprint, en pointant ce dépôt.
+# Le détail pas à pas, y compris la création de la base, est dans
+# `deploy/DEPLOIEMENT.md`.
+#
+# ⚠️ CE QUI EST DÉPLOYÉ N'EST PAS TOUT À FAIT L'ARCHITECTURE DU PROJET.
+#
+# Le dépôt tient deux applications séparées : une API NestJS (`api/`) et une
+# interface Next.js (`web/`), chacune avec ses dépendances, ses tests et son
+# cycle de vie. Ici, les deux tournent dans UN conteneur.
+#
+# Raison : l'offre gratuite endort un service après quinze minutes sans visite.
+# Avec deux services, l'interface se réveille, interroge une API encore
+# endormie, et le visiteur reçoit une erreur — puis une page correcte s'il
+# recharge. Un seul conteneur dort et se réveille d'un bloc.
+#
+# Ce qui reste vrai : tout le code, les index et les transactions, les
+# garanties du domaine, et la séparation des deux applications dans le dépôt.
+# Ce qui est perdu : le déploiement et le dimensionnement indépendants.
+#
+# Mesuré sur l'image : 161 Mio au repos, pour 512 disponibles.
+
+services:
+  - type: web
+    name: artisans-ma
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: frankfurt # la plus proche du Maroc parmi les régions gratuites
+    plan: free
+    autoDeploy: true
+
+    # La racine de l'interface. Elle ne dépend pas de l'API pour répondre, donc
+    # elle reste saine pendant que la base se prépare — ce qui est exactement
+    # ce qu'un contrôle de santé doit mesurer : « le service écoute-t-il ? »,
+    # et non « toutes ses dépendances sont-elles prêtes ? ».
+    healthCheckPath: /
+
+    envVars:
+      # ── À RENSEIGNER À LA MAIN dans le tableau de bord ───────────────────
+      # Jamais ici : ce fichier est public.
+
+      # Chaîne MongoDB Atlas, offre M0 (gratuite et permanente) :
+      #   mongodb+srv://utilisateur:motdepasse@grappe.xxxxx.mongodb.net/artisans
+      #
+      # SANS `directConnection=true`. Ce réglage est destiné au montage local,
+      # où le replica set à un nœud s'annonce sur une adresse injoignable
+      # depuis l'hôte. Sur Atlas, qui est un replica set à trois nœuds, il
+      # collerait le pilote à un seul d'entre eux et supprimerait la bascule
+      # automatique. Le script de démarrage avertit s'il le trouve.
+      - key: MONGO_URI
+        sync: false
+
+      # Tirée au hasard, et propre à ce déploiement :
+      #   node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
+      #
+      # Sans elle, le script de démarrage REFUSE de démarrer. C'est voulu :
+      # la valeur de repli du code est écrite en clair dans un dépôt public,
+      # et démarrer avec elle donnerait des sessions que n'importe qui forge.
+      - key: JWT_SECRET
+        sync: false
+
+      # ── Réglages fixes ──────────────────────────────────────────────────
+
+      # Mettre à 1 pour la PREMIÈRE mise en ligne, puis le remettre à 0.
+      #
+      # Le semis vide la base avant de la remplir. Le laisser à 1 réinitialise
+      # la démonstration à chaque réveil du conteneur — c'est-à-dire à chaque
+      # visite après quinze minutes de calme — et efface sous les yeux d'un
+      # visiteur ce qu'un autre vient d'y faire.
+      - key: SEMER_AU_DEMARRAGE
+        value: "0"
+
+      # 8,00 % — figé sur chaque réservation à l'acceptation du devis. Changer
+      # cette valeur n'affecte que les réservations futures.
+      - key: COMMISSION_POINTS_DE_BASE
+        value: "800"
+
+      - key: NODE_ENV
+        value: production

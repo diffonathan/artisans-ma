@@ -422,6 +422,23 @@ dans un vrai serveur — transactions, index uniques partiels, `$geoNear`. Une
 base simulée rendrait les tests verts sans rien prouver, ce qui est pire que
 pas de test.
 
+### Mettre en ligne
+
+```bash
+docker build -t artisans-ma . && docker run -p 10000:10000   -e MONGO_URI='mongodb+srv://…/artisans' -e JWT_SECRET='…' artisans-ma
+```
+
+Le déploiement complet — MongoDB Atlas pour la base, Render pour
+l'application, les deux gratuits et permanents — est décrit pas à pas dans
+[`deploy/DEPLOIEMENT.md`](deploy/DEPLOIEMENT.md), avec ce qui s'écarte d'une
+vraie exploitation et pourquoi.
+
+Deux points qui ne se devinent pas : l'offre M0 d'Atlas **est** un replica
+set, donc les transactions y fonctionnent sans rien monter ; et le conteneur
+**ouvre son port avant de préparer la base**, parce qu'un service qui se
+prépare avant d'écouter se fait tuer par le contrôle de santé de l'hébergeur.
+Mesuré sur l'image : 161 Mio au repos, pour 512 disponibles.
+
 ### Comptes de démonstration
 
 Mot de passe commun : `demonstration-2026`
@@ -469,7 +486,7 @@ comme telle.
 | Base | MongoDB 8 en replica set, Mongoose 9 |
 | Tests | vitest, supertest, contre un vrai MongoDB |
 | Authentification | JWT, scrypt (bibliothèque standard de Node) |
-| Infrastructure | Docker Compose, Redis 8 |
+| Infrastructure | Docker Compose |
 
 ---
 

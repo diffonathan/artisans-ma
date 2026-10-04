@@ -44,6 +44,27 @@ const configuration: NextConfig = {
   turbopack: {
     root: import.meta.dirname,
   },
+
+  /**
+   * Sortie autonome, pour l'image de production.
+   *
+   * `next build` produit alors `.next/standalone/` : un serveur minimal et
+   * uniquement les fichiers de `node_modules` que le code atteint réellement.
+   * L'image finale n'a donc pas besoin d'un `npm ci` — elle recopie un dossier.
+   *
+   * Ce qui compte ici n'est pas la taille de l'image mais la MÉMOIRE :
+   * l'offre gratuite de Render donne 512 Mio, et le conteneur fait tourner
+   * DEUX processus Node — l'API NestJS et ce serveur. `next start` chargerait
+   * l'arbre complet des dépendances ; le serveur autonome ne charge que le
+   * nécessaire.
+   *
+   * Deux pièges que la documentation signale et qu'on paie sinon au premier
+   * déploiement : le serveur autonome ne recopie NI `public/` NI
+   * `.next/static/`. Sans eux, la page s'affiche sans aucune feuille de style
+   * et sans police — ce qui ressemble à un bogue de rendu, pas à un fichier
+   * manquant. Le Dockerfile les remet en place explicitement.
+   */
+  output: 'standalone',
 };
 
 export default configuration;

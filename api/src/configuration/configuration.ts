@@ -31,8 +31,6 @@ const schema = z.object({
     .min(1)
     .default('mongodb://localhost:27018/artisans?directConnection=true'),
 
-  REDIS_URI: z.string().min(1).default('redis://localhost:6380'),
-
   /** Commission de la place de marché, en points de base (250 = 2,50 %). */
   COMMISSION_POINTS_DE_BASE: z.coerce.number().int().min(0).max(10_000).default(800),
 

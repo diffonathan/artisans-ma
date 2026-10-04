@@ -1,5 +1,10 @@
 # Infrastructure de développement d'Artisans.ma.
 #
+# UN seul service, et c'est délibéré : rien d'autre n'est utilisé par le code.
+# Un `docker compose` qui démarre des services dont l'application ignore
+# l'existence raconte une architecture qui n'existe pas — et c'est le genre
+# d'écart qu'un lecteur technique vérifie en premier.
+#
 # ── Pourquoi un replica set pour UN seul nœud ───────────────────────────────
 # MongoDB n'autorise les transactions multi-documents que sur un replica set.
 # En nœud unique « classique », `session.startTransaction()` échoue avec
@@ -12,6 +17,9 @@
 #
 # D'où un replica set à un membre : le coût d'exploitation d'un nœud, les
 # garanties transactionnelles d'un cluster.
+#
+# En production, MongoDB Atlas rend ce montage inutile : son offre gratuite
+# EST déjà un replica set à trois nœuds. Voir `deploy/DEPLOIEMENT.md`.
 
 services:
   mongo:
@@ -60,23 +68,5 @@ services:
       timeout: 15s
       retries: 3
 
-  redis:
-    image: redis:8-alpine
-    container_name: artisans-redis
-    # `--appendonly yes` : le cache survit à un redémarrage du conteneur.
-    # En développement c'est du confort ; en production ce serait un choix à
-    # justifier, un cache perdu devant pouvoir se reconstruire.
-    command: ["redis-server", "--appendonly", "yes"]
-    ports:
-      - "6380:6379"
-    volumes:
-      - redis-donnees:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
 volumes:
   mongo-donnees:
-  redis-donnees:
