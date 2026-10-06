@@ -114,6 +114,36 @@ const semer = async () => {
   const reservations = app.get(ReservationsService);
   const avis = app.get(AvisService);
 
+
+  // ── `--si-vide` : semer seulement une base neuve ─────────────────────────
+  //
+  // Le semis VIDE la base avant de la remplir. Lancé à chaque démarrage, il
+  // réinitialiserait la démonstration à chaque réveil du conteneur — c'est-à-
+  // dire à chaque visite après quinze minutes de calme — et effacerait le
+  // parcours d'un visiteur sous ses yeux.
+  //
+  // D'où ce mode, qui est celui du déploiement : on sème si la base est
+  // neuve, on ne touche à rien sinon. Il remplace un réglage qu'il fallait
+  // mettre à 1 pour la première mise en ligne puis remettre à 0 — trois
+  // passages au tableau de bord, et une démonstration vide le jour où l'on
+  // oubliait le premier.
+  //
+  // Le test porte sur les COMPTES et non sur l'existence de collections :
+  // Mongoose les crée vides au démarrage en synchronisant les index, donc
+  // « il existe des collections » ne veut pas dire « il y a des données ».
+  // C'est le piège de cette vérification, et il est silencieux.
+  if (process.argv.includes('--si-vide')) {
+    const dejaLa = await connexion
+      .db!.collection('comptes')
+      .countDocuments({}, { limit: 1 });
+    if (dejaLa > 0) {
+      console.log('Base déjà peuplée : rien à semer, et surtout rien à effacer.');
+      await app.close();
+      return;
+    }
+    console.log('Base neuve : semis.');
+  }
+
   // On repart de zéro à chaque exécution, pour que la commande soit
   // rejouable. Sinon la seconde exécution échoue sur les adresses en double,
   // et l'on ne sait plus quel état on a sous les yeux.

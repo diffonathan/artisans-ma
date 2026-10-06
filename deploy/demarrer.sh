@@ -80,22 +80,36 @@ echo "API prête après ${ATTENTE} s."
 echo "Démarrage de l'interface sur le port ${PORT}…"
 HOSTNAME=0.0.0.0 node web/server.js &
 PID_WEB=$!
-
 # ── 3. Le jeu de démonstration, APRÈS l'ouverture du port ───────────────────
 #
-# `SEMER_AU_DEMARRAGE=1` le déclenche. Il n'est pas automatique : une
-# démonstration consultée par plusieurs personnes ne doit pas se réinitialiser
-# à chaque réveil du conteneur, qui a lieu à chaque visite après quinze
-# minutes de calme. On le met à 1 pour la première mise en ligne, puis on le
-# retire.
+# Par défaut : `--si-vide`. On sème une base neuve, et on ne touche à rien si
+# elle contient déjà quelque chose.
+#
+# Pourquoi pas systématiquement : le semis VIDE la base avant de la remplir.
+# Lancé à chaque démarrage sans garde, il réinitialiserait la démonstration à
+# chaque réveil du conteneur — c'est-à-dire à chaque visite après quinze
+# minutes de calme — et effacerait le parcours d'un visiteur sous ses yeux.
+#
+# Pourquoi pas « à la main la première fois » non plus : c'était le réglage
+# précédent, qu'il fallait mettre à 1 pour la mise en ligne puis remettre à 0.
+# Trois passages au tableau de bord, et une démonstration vide le jour où l'on
+# oubliait le premier. La garde fait le même travail sans qu'on ait à y penser.
+#
+# `SEMER_AU_DEMARRAGE=1` force un semis COMPLET, qui écrase l'existant. C'est
+# la remise à zéro volontaire, et elle reste explicite.
 if [ "${SEMER_AU_DEMARRAGE:-0}" = "1" ]; then
-  echo "Semis du jeu de démonstration…"
-  if node api/dist/outils/semer.js; then
-    echo "Jeu de démonstration en place."
-  else
-    echo "AVERTISSEMENT : le semis a échoué. L'application reste en service,"
-    echo "                avec une base vide. Voir les lignes ci-dessus."
-  fi
+  echo "Semis FORCÉ du jeu de démonstration (la base existante est écrasée)…"
+  SEMIS_ARGS=""
+else
+  echo "Semis du jeu de démonstration si la base est vide…"
+  SEMIS_ARGS="--si-vide"
+fi
+
+if node api/dist/outils/semer.js $SEMIS_ARGS; then
+  :
+else
+  echo "AVERTISSEMENT : le semis a échoué. L'application reste en service,"
+  echo "                avec la base telle qu'elle est. Voir les lignes ci-dessus."
 fi
 
 echo "── En service ──────────────────────────────────────────────"

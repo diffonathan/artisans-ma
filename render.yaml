@@ -51,25 +51,33 @@ services:
       - key: MONGO_URI
         sync: false
 
-      # Tirée au hasard, et propre à ce déploiement :
-      #   node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
+      # Tirée au hasard, et propre à ce déploiement.
       #
       # Sans elle, le script de démarrage REFUSE de démarrer. C'est voulu :
       # la valeur de repli du code est écrite en clair dans un dépôt public,
       # et démarrer avec elle donnerait des sessions que n'importe qui forge.
+      #
+      # `generateValue` plutôt que `sync: false` : l'hébergeur la tire lui-même
+      # et la garde en secret. Personne ne la copie, elle ne transite par aucun
+      # presse-papiers et elle n'apparaît dans aucun fichier — alors qu'une
+      # valeur saisie à la main doit bien être produite quelque part, et c'est
+      # ce « quelque part » qui fuit. Il reste donc UNE seule valeur à saisir
+      # au tableau de bord, MONGO_URI, celle qu'on ne peut pas deviner.
       - key: JWT_SECRET
-        sync: false
+        generateValue: true
 
       # ── Réglages fixes ──────────────────────────────────────────────────
 
-      # Mettre à 1 pour la PREMIÈRE mise en ligne, puis le remettre à 0.
+      # Le jeu de démonstration se sème TOUT SEUL si la base est vide, et ne
+      # touche à rien sinon : il n'y a donc RIEN à régler ici pour la première
+      # mise en ligne. Ce réglage valait 0, devait passer à 1 le temps du
+      # premier déploiement, puis revenir à 0 — trois passages au tableau de
+      # bord, et une démonstration vide le jour où l'on oubliait le premier.
       #
-      # Le semis vide la base avant de la remplir. Le laisser à 1 réinitialise
-      # la démonstration à chaque réveil du conteneur — c'est-à-dire à chaque
-      # visite après quinze minutes de calme — et efface sous les yeux d'un
-      # visiteur ce qu'un autre vient d'y faire.
-      - key: SEMER_AU_DEMARRAGE
-        value: "0"
+      # Le poser à 1 force un semis COMPLET, qui ÉCRASE la base. C'est la
+      # remise à zéro volontaire, et elle doit le rester : ne pas le laisser
+      # à 1, sinon la démonstration se réinitialise à chaque réveil du
+      # conteneur, sous les yeux du visiteur en cours.
 
       # 8,00 % — figé sur chaque réservation à l'acceptation du devis. Changer
       # cette valeur n'affecte que les réservations futures.
