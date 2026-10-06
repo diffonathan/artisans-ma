@@ -58,28 +58,34 @@ l'hébergeur — un nœud unique ne ferait pas tourner l'application.
 
 1. <https://dashboard.render.com> → **New → Blueprint**, pointer ce dépôt.
    Render lit `render.yaml` et propose le service `artisans-ma`.
-2. Renseigner les deux variables marquées `sync: false` :
+2. Renseigner **la seule variable** marquée `sync: false` :
 
    | Variable | Valeur |
    |---|---|
    | `MONGO_URI` | la chaîne de l'étape 1 |
-   | `JWT_SECRET` | une valeur tirée au hasard — voir ci-dessous |
 
-   ```bash
-   node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
-   ```
+   `JWT_SECRET` n'est pas à saisir : `render.yaml` le déclare en
+   `generateValue`, et l'hébergeur le tire lui-même puis le garde en secret.
+   Personne ne le copie, il ne transite par aucun presse-papiers et il
+   n'apparaît dans aucun fichier — alors qu'une valeur saisie à la main doit
+   bien être produite quelque part, et c'est ce « quelque part » qui fuit.
 
-   Sans `JWT_SECRET`, **le conteneur refuse de démarrer**. C'est délibéré : la
+   Sans lui, **le conteneur refuserait de démarrer**. C'est délibéré : la
    valeur de repli du code est écrite en clair dans un dépôt public, et
    démarrer avec elle donnerait des sessions que n'importe qui peut forger.
 
-3. Pour la **première** mise en ligne seulement, passer `SEMER_AU_DEMARRAGE` à
-   `1`. Une fois la démonstration peuplée, le remettre à `0` et redéployer.
+3. **Rien à faire pour le jeu de démonstration.** Il se sème tout seul si la
+   base est vide, et ne touche à rien sinon.
 
-   Le semis **vide la base** avant de la remplir. Le laisser à `1`
-   réinitialiserait la démonstration à chaque réveil du conteneur — c'est-à-dire
-   à chaque visite après quinze minutes de calme — et effacerait sous les yeux
-   d'un visiteur ce qu'un autre vient d'y faire.
+   Le semis **vide la base** avant de la remplir : le lancer à chaque
+   démarrage réinitialiserait la démonstration à chaque réveil du conteneur —
+   c'est-à-dire à chaque visite après quinze minutes de calme — et effacerait
+   sous les yeux d'un visiteur ce qu'un autre vient d'y faire. D'où la garde
+   `--si-vide`, qui est le mode par défaut.
+
+   `SEMER_AU_DEMARRAGE=1` force un semis **complet**, qui écrase la base. Ne
+   le laissez pas à `1` : c'est la remise à zéro volontaire, pas un réglage de
+   mise en ligne.
 
 ---
 
@@ -118,7 +124,9 @@ https://VOTRE-SERVICE.onrender.com/technique
 La deuxième doit afficher **« Peinture Atlantique — Essaouira, à 168 km, se
 déplace jusqu'à 200 km »**. C'est le résultat qui démontre le produit : un
 artisan lointain retenu parce que SON rayon couvre le chantier. S'il manque,
-la base est vide — repasser `SEMER_AU_DEMARRAGE` à `1` une fois.
+la base est vide. Regardez les journaux : le semis s'annonce (« Base neuve :
+semis ») ou dit pourquoi il s'est abstenu. S'il a échoué, l'application reste
+en service et l'avertissement est dans les journaux.
 
 À l'inverse, `?metier=MENUISERIE&ville=marrakech` ne doit rien rendre : le
 menuisier du jeu d'essai est à 30 km, et son rayon s'arrête à 10.
@@ -136,7 +144,8 @@ Les comptes de démonstration et leur mot de passe commun sont dans le README.
 | hôte introuvable dans les journaux | caractère spécial non encodé dans le mot de passe |
 | `Transaction numbers are only allowed on a replica set` | la chaîne pointe une base qui n'est pas un replica set |
 | pages sans aucun style | `.next/static` absent de l'image — voir le `Dockerfile` |
-| la démonstration se vide toute seule | `SEMER_AU_DEMARRAGE` resté à `1` |
+| la démonstration se vide toute seule | `SEMER_AU_DEMARRAGE` posé à `1` et laissé là |
+| la démonstration est vide au premier jour | le semis a échoué : son avertissement est dans les journaux |
 
 Les journaux sont dans **Logs**, sur la page du service. Le script de
 démarrage y écrit chaque étape, et nomme la cause probable quand il s'arrête.
